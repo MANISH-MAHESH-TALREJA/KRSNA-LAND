@@ -1,0 +1,21 @@
+<div class="card best-list-card" style="width: 18rem; margin: 0.75rem">
+    <img height="200px" src="<%= listData.image %>"
+         class="card-img-top" alt="<%= listData.title %>" style="border-radius: 0.2rem;">
+    <div class="card-body">
+        <h5 class="card-title"><%= listData.title %></h5>
+        <p class="card-text" style="height: 125px; overflow: hidden"><%= listData.description %></p>
+        <ul style="list-style-type: none; margin-left: -30px">
+            <li>&#x1F4B5;&nbsp;&nbsp;<b>Price</b> ₹. <%= listData.price.toLocaleString("en-IN") %></li>
+            <li>&#x1F3E0;&nbsp;&nbsp;<b>Location:</b> <%= listData.location %></li>
+            <li>&#x1F30D;&nbsp;&nbsp;<b>Country:</b> <%= listData.country %></li>
+        </ul>
+        <div style="display: flex; justify-content: center">
+            <a style="margin-right: 0.5rem" href="/<%= listData.id %>" class="btn btn-warning">View</a>
+            <a style="margin-right: 0.5rem" href="/<%= listData.id %>/edit" class="btn btn-primary">Edit</a>
+            <form method="POST" id="deleteFormMain">
+                <button class="btn btn-danger" type="button" data-id="<%= listData.id %>" onclick="deleteListing(this);">Delete</button>
+            </form>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,47 @@
+<%- include('header.ejs'); %>
+<%- include('navbar.ejs'); %>
+
+<h1 style="text-align: center; margin: 1rem">Edit Your Listings</h1>
+<form style="margin: 1rem; border-radius: 10px; border: 2px solid black; padding: 1rem;"
+      action="/<%= fetchedListing.id %>?_method=PATCH" method="post">
+    <div class="mb-3">
+        <label for="title" class="form-label">Title</label>
+        <input type="text" required class="form-control" id="title" value="<%= fetchedListing.title %>" name="title">
+    </div>
+    <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea id="description" required class="form-control"
+                  name="description"><%= fetchedListing.description %></textarea>
+    </div>
+    <div class="mb-3">
+        <label for="image" class="form-label">Image</label>
+        <input type="url" class="form-control" id="image" value="<%= fetchedListing.image %>" name="image"
+               aria-describedby="imageHelp">
+        <div id="imageHelp" class="form-text">Kindly enter image link url here</div>
+    </div>
+    <div class="row">
+        <div class="mb-3 col-md-4 col-12">
+            <label for="price" class="form-label">Price</label>
+            <input type="number" required class="form-control" id="price" name="price"
+                   value="<%= fetchedListing.price %>">
+        </div>
+        <div class="mb-3 col-md-4 col-12">
+            <label for="location" class="form-label">Location</label>
+            <input type="text" required class="form-control" id="location" name="location"
+                   value="<%= fetchedListing.location %>">
+        </div>
+        <div class="mb-3 col-md-4 col-12">
+            <label for="country" class="form-label">Country</label>
+            <input type="text" required class="form-control" id="country" name="country"
+                   value="<%= fetchedListing.country %>">
+        </div>
+    </div>
+
+    <div class="mb-3 form-check">
+        <input type="checkbox" checked class="form-check-input" required id="exampleCheck1">
+        <label class="form-check-label" for="exampleCheck1"><i>I agree to Hare Krishna Land terms and conditions and
+                privacy policy.</i></label>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+<%- include('footer.ejs'); %>

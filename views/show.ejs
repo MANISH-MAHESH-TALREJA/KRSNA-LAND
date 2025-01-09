@@ -1,0 +1,32 @@
+<%- include('header.ejs'); %>
+<%- include('navbar.ejs'); %>
+<h1 style="text-align: center;margin: 1rem;">Listing Details</h1>
+<div class="row">
+    <div class="col-8 offset-2">
+        <div class="card">
+            <img src="<%= fetchedListing.image %>" class="card-img-top show-image" alt="<%= fetchedListing.title %>">
+            <div class="card-body">
+                <p class="card-text"><b><%= fetchedListing.title %></b></p>
+                <p class="card-text"><i><%= fetchedListing.description %></i></p>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">&#x1F4B5;&nbsp;&nbsp;<b>Price</b>
+                        ₹. <%= fetchedListing.price.toLocaleString("en-IN") %></li>
+                    <li class="list-group-item">&#x1F3E0;&nbsp;&nbsp;<b>Location:</b> <%= fetchedListing.location %>
+                    </li>
+                    <li class="list-group-item">&#x1F30D;&nbsp;&nbsp;<b>Country:</b> <%= fetchedListing.country %></li>
+                </ul>
+                <div style="display: flex; justify-content: center; margin-top: 2rem;">
+                    <a style="margin-right: 0.5rem; width: 50%" href="/<%= fetchedListing.id %>/edit" class="btn btn-primary">Edit</a>
+                    <form method="POST" id="deleteFormMain" style="margin-right: 0.5rem; width: 50%">
+                        <button style="margin-right: 0.5rem; width: 100%" class="btn btn-danger" type="button" data-id="<%= fetchedListing.id %>"
+                                onclick="deleteListing(this);">Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<%- include('footer.ejs'); %>

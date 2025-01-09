@@ -1,0 +1,53 @@
+<%- include('header.ejs'); %>
+<%- include('navbar.ejs'); %>
+
+<h1 style="text-align: center; margin: 1rem">Add Your Listings</h1>
+<form novalidate class="needs-validation"
+      style="margin: 1rem; border-radius: 10px; border: 2px solid black; padding: 1rem;" action="/" method="post">
+    <div class="mb-3">
+        <label for="title" class="form-label">Title</label>
+        <input type="text" required class="form-control" id="title" name="title">
+        <div class="valid-feedback">Looks good!</div>
+        <div class="invalid-feedback">Kindly enter correct value</div>
+    </div>
+    <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea id="description" required class="form-control" name="description"></textarea>
+        <div class="valid-feedback">Looks good!</div>
+        <div class="invalid-feedback">Kindly enter correct value</div>
+    </div>
+    <div class="mb-3">
+        <label for="image" class="form-label">Image</label>
+        <input type="url" class="form-control" id="image" name="image" aria-describedby="imageHelp">
+        <div id="imageHelp" class="form-text">Kindly enter image link url here</div>
+        <div class="valid-feedback">Looks good!</div>
+        <div class="invalid-feedback">Kindly enter correct value</div>
+    </div>
+    <div class="row">
+        <div class="mb-3 col-md-4 col-12">
+            <label for="price" class="form-label">Price</label>
+            <input type="text" required class="form-control" id="price" name="price">
+            <div class="valid-feedback">Looks good!</div>
+            <div class="invalid-feedback">Kindly enter correct value</div>
+        </div>
+        <div class="mb-3 col-md-4 col-12">
+            <label for="location" class="form-label">Location</label>
+            <input type="text" required class="form-control" id="location" name="location">
+            <div class="valid-feedback">Looks good!</div>
+            <div class="invalid-feedback">Kindly enter correct value</div>
+        </div>
+        <div class="mb-3 col-md-4 col-12">
+            <label for="country" class="form-label">Country</label>
+            <input type="text" required class="form-control" id="country" name="country">
+            <div class="valid-feedback">Looks good!</div>
+            <div class="invalid-feedback">Kindly enter correct value</div>
+        </div>
+    </div>
+    <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" required id="exampleCheck1">
+        <label class="form-check-label" for="exampleCheck1"><i>I agree to Hare Krishna Land terms and conditions and
+                privacy policy.</i></label>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+<%- include('footer.ejs'); %>

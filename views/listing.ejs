@@ -1,0 +1,13 @@
+<%- include('header.ejs'); %>
+<a href="/add" class="fab">+</a>
+<%- include('navbar.ejs'); %>
+<%- include('carousal.ejs'); %>
+<h3 style="margin: 1rem 0 0 1rem;"> Properties</h3>
+
+<div style="display: flex; flex-wrap: wrap">
+    <% for(let listData of listings) { %>
+        <%- include('list-card.ejs', { listData }); %>
+    <% } %>
+</div>
+
+<%- include('footer.ejs'); %>
