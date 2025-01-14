@@ -1,6 +1,6 @@
 <div class="card best-list-card" style="width: 18rem; margin: 0.75rem">
     <img height="200px" src="<%= listData.image %>"
-         class="card-img-top" alt="<%= listData.title %>" style="border-radius: 0.2rem;">
+         class="card-img-top" alt="<%= listData.title %>" style="border-radius: 0.2rem;" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1643266421634-467f26f84b56?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';">
     <div class="card-body">
         <h5 class="card-title"><%= listData.title %></h5>
         <p class="card-text" style="height: 125px; overflow: hidden"><%= listData.description %></p>
@@ -8,13 +8,15 @@
             <li>&#x1F4B5;&nbsp;&nbsp;<b>Price</b> ₹. <%= listData.price.toLocaleString("en-IN") %></li>
             <li>&#x1F3E0;&nbsp;&nbsp;<b>Location:</b> <%= listData.location %></li>
             <li>&#x1F30D;&nbsp;&nbsp;<b>Country:</b> <%= listData.country %></li>
+            <li>⭐&nbsp;&nbsp;<b>Reviews:</b> <%= listData.reviews.length %> Reviews</li>
         </ul>
-        <div style="display: flex; justify-content: center">
-            <a style="margin-right: 0.5rem" href="/<%= listData.id %>" class="btn btn-warning">View</a>
-            <a style="margin-right: 0.5rem" href="/<%= listData.id %>/edit" class="btn btn-primary">Edit</a>
-            <form method="POST" id="deleteFormMain">
-                <button class="btn btn-danger" type="button" data-id="<%= listData.id %>" onclick="deleteListing(this);">Delete</button>
+        <div style="display: flex; justify-content: center; flex-wrap: wrap">
+            <a style="margin-right: 0.5rem" href="/<%= listData.id %>" class="btn btn-warning"><i class="fas fa-eye" style="color:white"></i> View</a>
+            <a style="margin-right: 0.5rem" href="/<%= listData.id %>/edit" class="btn btn-primary"><i class="fas fa-edit"></i> Edit</a>
+            <form method="POST" id="deleteFormMain" style="margin-top: 0.5rem">
+                <button class="btn btn-danger" type="button" data-id="<%= listData.id %>" onclick="deleteListing(this);"><i class="fas fa-trash"></i> Delete</button>
             </form>
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#reviewModal" data-bs-title="<%= listData.title %>" data-bs-id="<%= listData.id %>" style="margin: 0.5rem;"> <i class="fa fa-commenting-o"></i> Comment</button>
         </div>
 
     </div>

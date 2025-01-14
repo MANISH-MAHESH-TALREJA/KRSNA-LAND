@@ -1,0 +1,32 @@
+<div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="/review" method="post" id="reviewForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="reviewModalLabel"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                        <label for="rating" class="col-form-label">Rating (1-5):</label>
+                        <input type="number" min="0" max="5" maxlength="1" class="form-control" required id="rating"
+                               name="review[rating]">
+                    </div>
+                    <div class="mb-3">
+                        <label for="comment" class="col-form-label">Comment:</label>
+                        <textarea class="form-control" id="comment" required name="review[comment]"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="created" class="col-form-label">Creation Date Time:</label>
+                        <input type="datetime-local" class="form-control" id="created" name="review[createdAt]">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <input type="submit" class="btn btn-primary" value="Write Comment">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

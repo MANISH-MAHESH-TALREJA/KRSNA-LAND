@@ -5,7 +5,8 @@ const app = express();
 let port = 8000;
 let methodOverride = require('method-override')
 const mongoose = require("mongoose");
-const Listing = require("./models/listing");
+const {Listing, listingSchema} = require("./models/listing");
+const {Review, reviewSchema} = require("./models/review");
 const ExpressError = require("./utils/ExpressError");
 const wrapAsync = require("./utils/wrapAsync");
 app.set("view engine", "ejs");
@@ -21,7 +22,6 @@ app.locals.toastMessage = "";
 app.locals.showToast = false;
 app.locals.search = "";
 const listSchema = require("./schema/listingSchema.js");
-const Review = require("./models/reviews.js");
 const reviewClientSchema = require("./schema/reviewSchema.js");
 
 app.listen(port, () => {
@@ -75,9 +75,9 @@ app.get("/", wrapAsync(async (request, response) => {
 	app.locals.search = search;
 	let listings;
 	if(search && search.length > 3) {
-		listings = await Listing.find({title: {$regex: search, $options: "i"}});
+		listings = await Listing.find({title: {$regex: search, $options: "i"}}).populate("review");
 	} else {
-		listings = await Listing.find({});
+		listings = await Listing.find({}).populate("reviews");
 	}
 	response.render("listing", { listings });
 	app.locals.showToast = false;
@@ -95,7 +95,6 @@ app.get("/add", (request, response) => {
 app.post("/", wrapAsync(async (request, response) => {
 	let { title, description, image, price, location, country } = request.body;
 	let result = listSchema.validate(request.body);
-	console.log(result);
 	if(result.error) {
 		throw new ExpressError(400, result.error);
 	}
@@ -116,16 +115,16 @@ app.post("/", wrapAsync(async (request, response) => {
 app.get("/:id/edit", wrapAsync(async (request, response) => {
 	let { id } = request.params;
 	let fetchedListing = await Listing.findById(id);
-	console.log(fetchedListing);
 	response.render("edit_listing", { fetchedListing });
 }));
 
 app.get("/:id", wrapAsync(async (request, response) => {
 	app.locals.pageName = "LISTING DETAILS";
 	let { id } = request.params;
-	let fetchedListing = await Listing.findById(id);
-	console.log(fetchedListing);
+	let fetchedListing = await Listing.findById(id).populate("reviews");
 	response.render("show", { fetchedListing });
+	app.locals.toastMessage = "";
+	app.locals.showToast = false;
 }));
 
 
@@ -140,6 +139,8 @@ app.patch("/:id", wrapAsync(async (request, response) => {
 		app.locals.toastMessage = error;
 		app.locals.showToast = false;
 	});
+
+
 	response.redirect("/");
 }));
 
@@ -156,10 +157,44 @@ app.delete("/:id", wrapAsync(async (request, response) => {
 }));
 
 
+
+app.post("/review/:id", wrapAsync(async (request, response, next) => {
+	let { review } = request.body;
+	let { id } = request.params;
+	let result = reviewClientSchema.validate(request.body);
+	if(result.error) {
+		throw new ExpressError(400, result.error);
+	}
+
+	/*if(review.createdAt === null || review.createdAt === undefined || review.createdAt === '') {
+		review.createdAt = Date.now();
+	}*/
+
+	// USE THIS APPROACH IF YOU HAVE EMBEDDED REVIEW DOCUMENT INSIDE THE LISTING DOCUMENT IN CASE OF ONE TO MANY (ONE TO FEW)
+	// await Listing.findByIdAndUpdate(id, { $push : {reviews: review} }, {new: true, runValidators: true});
+	// USE THIS APPROACH IF YOU HAVE EMBEDDED REVIEW DOCUMENT INSIDE THE LISTING DOCUMENT IN CASE OF ONE TO MANY (APPROACH 02)
+	const userReview = new Review(review);
+	await userReview.save();
+	await Listing.findByIdAndUpdate(id, { $push : {reviews: userReview} }, {new: true, runValidators: true});
+	app.locals.toastMessage = "Review Added Successfully";
+	app.locals.showToast = true;
+	response.redirect("/");
+}));
+
+app.delete("/review/:listing/:id", wrapAsync(async (request, response) => {
+	let { listing, id } = request.params;
+	await Review.findByIdAndDelete(id);
+	await Listing.findByIdAndUpdate(listing, { $pull: { reviews: id }}, {new: true, runValidators: true});
+	app.locals.toastMessage = "Review Removed Successfully";
+	app.locals.showToast = true;
+	response.redirect(`/${listing}`);
+}));
+
 // HERE IS THE ERROR HANDLING MIDDLEWARE THAT WILL HANDLE ALL ERRORS
 
 app.use((err, req, res, next) => {
 	console.log("INSIDE THE MIDDLE WARE")
+	console.log(err);
 	let { status = 500, message = "INTERNAL SERVER ERROR" } = err;
 	res.render("error_page.ejs", { statusCode: status, errorText: message});
 	// return error to ejs and use err.stack to show full stack trace on ui

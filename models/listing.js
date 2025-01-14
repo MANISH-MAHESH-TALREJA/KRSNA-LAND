@@ -1,4 +1,7 @@
 const mongoose = require("mongoose");
+const {Schema} = require("mongoose");
+const {Review} = require("./review.js");
+
 const listingSchema = new mongoose.Schema({
 	title: {
 		required: true,
@@ -24,9 +27,30 @@ const listingSchema = new mongoose.Schema({
 	},
 	country: {
 		type: String,
+	},
+	reviews: [
+		{
+			type: Schema.Types.ObjectId,
+			ref: "review"
+		}
+	]
+});
+
+listingSchema.pre("findOneAndDelete", async () => {
+	console.log("PRE MIDDLEWARE EXECUTED");
+});
+
+listingSchema.post("findOneAndDelete", async (listing) => {
+	console.log("POST MIDDLEWARE EXECUTED");
+	console.log(listing);
+	if(listing && listing.reviews.length) {
+		await Review.deleteMany({ _id : {$in: listing.reviews }});
+		console.log("ALL REVIEWS DELETED");
 	}
 });
 
-const Listing = mongoose.model("Listing", listingSchema);
-
-module.exports = Listing;
+const Listing = mongoose.model("listing", listingSchema);
+module.exports = {
+	Listing,
+	listingSchema
+};

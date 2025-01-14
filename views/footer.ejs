@@ -165,5 +165,18 @@
 	}
 
 </script>
+
+<script>
+    let exampleModal = document.getElementById('reviewModal')
+    exampleModal.addEventListener('show.bs.modal', function (event) {
+		let button = event.relatedTarget;
+        let title = button.getAttribute('data-bs-title');
+        let id = button.getAttribute('data-bs-id');
+        let modalTitle = exampleModal.querySelector('.modal-title');
+        modalTitle.textContent = title
+        let reviewForm = document.getElementById("reviewForm");
+		reviewForm.setAttribute("action", `/review/${id}`);
+});
+</script>
 </body>
 </html>

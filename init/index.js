@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const { data } = require("./data");
-const Listing = require("../models/listing");
+const {Listing} = require("../models/listing");
+const {Review} = require("../models/review");
 
 async function main() {
 	await mongoose.connect("mongodb://127.0.0.1:27017/krsnaland");
@@ -9,7 +10,9 @@ async function main() {
 main().then(async (response) => {
 	console.log("DATABASE CONNECTED");
 	await Listing.deleteMany({});
-	Listing.insertMany(data).then((response) => {
+	console.log("ALL DATA IS DELETED");
+	await Review.deleteMany({});
+	await Listing.insertMany(data).then((response) => {
 		console.log("MANY RECORDS INSERTED");
 	}).catch((error) => {
 		console.log(error);
