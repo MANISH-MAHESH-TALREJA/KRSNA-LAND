@@ -23,6 +23,28 @@ app.locals.showToast = false;
 app.locals.search = "";
 const listSchema = require("./schema/listingSchema.js");
 const reviewClientSchema = require("./schema/reviewSchema.js");
+const session = require("express-session");
+const listings = require("./routes/listing");
+const reviews = require("./routes/reviews");
+const cookieParser = require("cookie-parser");
+const flash = require("connect-flash");
+
+app.use(cookieParser());
+app.use(flash());
+
+const sessionOptions = session({
+		secret: "MANISH#9833137409",
+		resave: false,
+		saveUninitialized: true,
+		cookie: {
+			expires: Date.now() * 7 * 24 * 60 * 60 * 1000, // DAYS * HOURS * EACH HOUR MINUTES * EACH MINUTE SECONDS * EACH SECOND MILLISECONDS
+			maxAge: 7 * 24 * 60 * 60 * 1000,
+			httpOnly: true,
+		}
+	}
+);
+
+app.use(sessionOptions);
 
 app.listen(port, () => {
 	console.log("APP IS LISTENING TO PORT 8000");
@@ -38,12 +60,30 @@ main().then((response) => {
 	console.log("SOME ERROR OCCURRED");
 });
 
-app.use((req, res, next) => {
-    if (req.originalUrl === "/favicon.ico") {
-        return res.status(204).send();
-    }
-    next();
+app.use((request, response, next) => {
+	response.locals.showToast = request.flash("showToast");
+	response.locals.toastMessage = request.flash("toastMessage");
+	next();
 });
+
+app.use((req, res, next) => {
+	if (req.originalUrl === "/favicon.ico") {
+		return res.status(204).send();
+	}
+	next();
+});
+
+app.get("/manish", (request, response) => {
+	response.send(request.flash("hare"));
+});
+app.get("/getCookie", (request, response) => {
+	request.flash("hare", "krishna");
+	response.cookie("greet", "hare krishna");
+	response.send("We send you the cookie");
+});
+
+app.use("/review", reviews);
+app.use("/", listings);
 
 // I have intentionally created an error here, once this page will be called then error
 // will be invoked and the error will look for the next error handling middleware
@@ -70,133 +110,16 @@ app.get("/test", (request, response, next) => {
 	});
 });
 
-app.get("/", wrapAsync(async (request, response) => {
-	const { search } = request.query;
-	app.locals.search = search;
-	let listings;
-	if(search && search.length > 3) {
-		listings = await Listing.find({title: {$regex: search, $options: "i"}}).populate("review");
-	} else {
-		listings = await Listing.find({}).populate("reviews");
-	}
-	response.render("listing", { listings });
-	app.locals.showToast = false;
-	app.locals.toastMessage = "";
-}));
-
-app.get("/add", (request, response) => {
-	let search = "";
-	response.render("add_listing");
-});
-
-// in this function i have used wrapAsync which using pre-defined try catch and if any error occurs, then the next error
-// handling middleware will be called, at last there is only one middleware which will be called which will display
-// error message along with error code.
-app.post("/", wrapAsync(async (request, response) => {
-	let { title, description, image, price, location, country } = request.body;
-	let result = listSchema.validate(request.body);
-	if(result.error) {
-		throw new ExpressError(400, result.error);
-	}
-	const newListing = new Listing({
-		title: title,
-		description: description,
-		image: image,
-		price: price,
-		location: location,
-		country: country
-	});
-	await newListing.save();
-	app.locals.toastMessage = "Listing Added Successfully";
-	app.locals.showToast = true;
-	response.redirect("/");
-}));
-
-app.get("/:id/edit", wrapAsync(async (request, response) => {
-	let { id } = request.params;
-	let fetchedListing = await Listing.findById(id);
-	response.render("edit_listing", { fetchedListing });
-}));
-
-app.get("/:id", wrapAsync(async (request, response) => {
-	app.locals.pageName = "LISTING DETAILS";
-	let { id } = request.params;
-	let fetchedListing = await Listing.findById(id).populate("reviews");
-	response.render("show", { fetchedListing });
-	app.locals.toastMessage = "";
-	app.locals.showToast = false;
-}));
-
-
-app.patch("/:id", wrapAsync(async (request, response) => {
-	let { title, description, image, price, location, country } = request.body;
-	let updateData = {title: title, description: description, image: image, price: price, location: location, country: country}
-	let { id } = request.params;
-	Listing.findByIdAndUpdate(id, { ...updateData}, {new: true, runValidators: true}).then((response) => {
-		app.locals.toastMessage = "Listing Updated Successfully";
-		app.locals.showToast = true;
-	}).catch((error) => {
-		app.locals.toastMessage = error;
-		app.locals.showToast = false;
-	});
-
-
-	response.redirect("/");
-}));
-
-app.delete("/:id", wrapAsync(async (request, response) => {
-	let { id } = request.params;
-	Listing.findByIdAndDelete(id).then((response) => {
-		app.locals.toastMessage = "Listing Deleted Successfully";
-		app.locals.showToast = true;
-	}).catch((error) => {
-		app.locals.toastMessage = error;
-		app.locals.showToast = false;
-	});
-	response.redirect("/");
-}));
-
-
-
-app.post("/review/:id", wrapAsync(async (request, response, next) => {
-	let { review } = request.body;
-	let { id } = request.params;
-	let result = reviewClientSchema.validate(request.body);
-	if(result.error) {
-		throw new ExpressError(400, result.error);
-	}
-
-	/*if(review.createdAt === null || review.createdAt === undefined || review.createdAt === '') {
-		review.createdAt = Date.now();
-	}*/
-
-	// USE THIS APPROACH IF YOU HAVE EMBEDDED REVIEW DOCUMENT INSIDE THE LISTING DOCUMENT IN CASE OF ONE TO MANY (ONE TO FEW)
-	// await Listing.findByIdAndUpdate(id, { $push : {reviews: review} }, {new: true, runValidators: true});
-	// USE THIS APPROACH IF YOU HAVE EMBEDDED REVIEW DOCUMENT INSIDE THE LISTING DOCUMENT IN CASE OF ONE TO MANY (APPROACH 02)
-	const userReview = new Review(review);
-	await userReview.save();
-	await Listing.findByIdAndUpdate(id, { $push : {reviews: userReview} }, {new: true, runValidators: true});
-	app.locals.toastMessage = "Review Added Successfully";
-	app.locals.showToast = true;
-	response.redirect("/");
-}));
-
-app.delete("/review/:listing/:id", wrapAsync(async (request, response) => {
-	let { listing, id } = request.params;
-	await Review.findByIdAndDelete(id);
-	await Listing.findByIdAndUpdate(listing, { $pull: { reviews: id }}, {new: true, runValidators: true});
-	app.locals.toastMessage = "Review Removed Successfully";
-	app.locals.showToast = true;
-	response.redirect(`/${listing}`);
-}));
 
 // HERE IS THE ERROR HANDLING MIDDLEWARE THAT WILL HANDLE ALL ERRORS
 
 app.use((err, req, res, next) => {
 	console.log("INSIDE THE MIDDLE WARE")
 	console.log(err);
-	let { status = 500, message = "INTERNAL SERVER ERROR" } = err;
-	res.render("error_page.ejs", { statusCode: status, errorText: message});
+	let {status = 500, message = "INTERNAL SERVER ERROR"} = err;
+	res.render("error_page.ejs", {statusCode: status, errorText: message});
 	// return error to ejs and use err.stack to show full stack trace on ui
 	// res.status(status).send(message);
 });
+
+
