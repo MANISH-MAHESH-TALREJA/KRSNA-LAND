@@ -16,10 +16,8 @@ const reviewSchema = new mongoose.Schema({
 		type: Date,
 		default: Date.now(),
 		set: (dates) => (dates === null || dates === undefined || dates === "") ? Date.now() : dates
-
 	}
 });
-
 
 const Review = mongoose.model("review", reviewSchema);
 

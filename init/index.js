@@ -1,12 +1,11 @@
 const mongoose = require("mongoose");
 const { data } = require("./data");
-const {Listing} = require("../models/listing");
-const {Review} = require("../models/review");
+const { Listing } = require("../models/listing");
+const { Review } = require("../models/review");
 
 async function main() {
 	await mongoose.connect("mongodb://127.0.0.1:27017/krsnaland");
 }
-
 main().then(async (response) => {
 	console.log("DATABASE CONNECTED");
 	await Listing.deleteMany({});

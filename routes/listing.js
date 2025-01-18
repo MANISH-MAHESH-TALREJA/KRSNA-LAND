@@ -1,10 +1,18 @@
+// EXPRESS
 const express = require("express");
-const wrapAsync = require("../utils/wrapAsync");
-const {Listing} = require("../models/listing");
-const {Review} = require("../models/review");
-const listSchema = require("../schema/listingSchema");
-const ExpressError = require("../utils/ExpressError");
 const router = express.Router();
+
+// REQUIRE UTILS
+const ExpressError = require("../utils/ExpressError");
+const wrapAsync = require("../utils/wrapAsync");
+
+// REQUIRE MODELS
+const {Listing} = require("../models/listing");
+
+// REQUIRE LISTING SCHEMA
+const listSchema = require("../schema/listingSchema");
+
+// VIEW ALL LISTINGS - HOMEPAGE ROUTE
 
 router.get("/", wrapAsync(async (request, response) => {
 	const {search} = request.query;
@@ -19,14 +27,13 @@ router.get("/", wrapAsync(async (request, response) => {
 	response.render("listing", {listings});
 }));
 
+// ADD LISTING PAGE ROUTE
 router.get("/add", (request, response) => {
-	let search = "";
 	response.render("add_listing");
 });
 
-// in this function I have used wrapAsync which using pre-defined try catch and if any error occurs, then the next error
-// handling middleware will be called, at last there is only one middleware which will be called which will display
-// error message along with error code.
+// ADD LISTING POST ROUTE
+
 router.post("/", wrapAsync(async (request, response) => {
 	let {title, description, image, price, location, country} = request.body;
 	let result = listSchema.validate(request.body);
@@ -47,11 +54,15 @@ router.post("/", wrapAsync(async (request, response) => {
 	response.redirect("/");
 }));
 
+// EDIT LISTING PAGE ROUTE
+
 router.get("/:id/edit", wrapAsync(async (request, response) => {
 	let {id} = request.params;
 	let fetchedListing = await Listing.findById(id);
 	response.render("edit_listing", {fetchedListing});
 }));
+
+// VIEW LISTING DETAILS ROUTE
 
 router.get("/:id", wrapAsync(async (request, response) => {
 	response.locals.pageName = "LISTING DETAILS";
@@ -60,6 +71,7 @@ router.get("/:id", wrapAsync(async (request, response) => {
 	response.render("show", {fetchedListing});
 }));
 
+// EDIT LISTING PATCH ROUTE
 
 router.patch("/:id", wrapAsync(async (request, response) => {
 	let {title, description, image, price, location, country} = request.body;
@@ -73,25 +85,29 @@ router.patch("/:id", wrapAsync(async (request, response) => {
 	}
 	let {id} = request.params;
 	Listing.findByIdAndUpdate(id, {...updateData}, {new: true, runValidators: true}).then((result) => {
-		request.flash("toastMessage", "Listing Updated Successfully")
-		request.flash("showToast", "true")
+		console.log(`${result}`);
+		request.flash("toastMessage", "Listing Updated Successfully");
+		request.flash("showToast", "true");
 		response.redirect("/");
 	}).catch((error) => {
-		request.flash("toastMessage", error)
-		request.flash("showToast", "false")
+		request.flash("toastMessage", error);
+		request.flash("showToast", "false");
 		response.redirect("/");
 	});
 }));
 
+// DELETE LISTING ROUTE
+
 router.delete("/:id", wrapAsync(async (request, response) => {
 	let {id} = request.params;
 	Listing.findByIdAndDelete(id).then((result) => {
-		request.flash("toastMessage", "Listing Deleted Successfully")
-		request.flash("showToast", "true")
+		console.log(`${result}`);
+		request.flash("toastMessage", "Listing Deleted Successfully");
+		request.flash("showToast", "true");
 		response.redirect("/");
 	}).catch((error) => {
-		request.flash("toastMessage", error)
-		request.flash("showToast", "false")
+		request.flash("toastMessage", error);
+		request.flash("showToast", "false");
 		response.redirect("/");
 	});
 }));

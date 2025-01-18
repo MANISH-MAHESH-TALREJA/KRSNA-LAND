@@ -131,8 +131,8 @@ const sampleListings = [
 		country: "United States"
 	},
 	{
-		title: "Cliffside House",
-		description: "Unique house with breathtaking cliffside views.",
+		title: "Cliff Side House",
+		description: "Unique house with breathtaking cliff Side views.",
 		image: "https://images.unsplash.com/photo-1494526585095-c41746248156?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800",
 		price: 3200,
 		location: "Capri",
