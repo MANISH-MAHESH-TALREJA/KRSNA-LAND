@@ -59,11 +59,14 @@ app.use(session({
 	}
 ));
 app.use(passport.initialize());
+// noinspection JSCheckFunctionSignatures
 app.use(passport.session());
 
 // HANDLE FLASH MESSAGES - MIDDLEWARE
 app.use((request, response, next) => {
+	// noinspection JSUnresolvedReference
 	response.locals.showToast = request.flash("showToast");
+	// noinspection JSUnresolvedReference
 	response.locals.toastMessage = request.flash("toastMessage");
 	next();
 });
@@ -91,6 +94,7 @@ passport.serializeUser(User.deserializeUser());
 app.use((error, request, response) => {
 	console.log(`ERROR HANDLING MIDDLEWARE - ${error}`);
 	let {status = 500, message = "INTERNAL SERVER ERROR"} = error;
+	// noinspection JSUnresolvedReference
 	response.render("error_page.ejs", {statusCode: status, errorText: message});
 	// return error to ejs and use err.stack to show full stack trace on ui
 	// res.status(status).send(message);
