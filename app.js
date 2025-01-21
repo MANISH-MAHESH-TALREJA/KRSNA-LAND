@@ -13,7 +13,8 @@ const mongoose = require("mongoose");
 
 const listings = require("./routes/listing");
 const reviews = require("./routes/reviews");
-const {User} = require("./models/user");
+const users = require("./routes/users");
+const { User } = require("./models/user");
 
 // ----------- START INITIALIZE THE EXPRESS APP AND MONGO DB DATABASE
 
@@ -21,7 +22,7 @@ const app = express();
 let port = 8000;
 app.locals.pageName = "KRSNA LAND";
 app.listen(port, () => {
-	console.log("APP IS LISTENING TO PORT 8000");
+	console.log(`APP IS LISTENING TO PORT ${port}`);
 });
 
 async function main() {
@@ -33,8 +34,6 @@ main().then((response) => {
 }).catch((error) => {
 	console.log(`SOME ERROR OCCURRED - ${error}`);
 });
-
-// ----------- CLOSE INITIALIZE THE EXPRESS APP AND MONGO DB DATABASE
 
 // MIDDLEWARES
 
@@ -77,37 +76,20 @@ app.use((req, res, next) => {
 	next();
 });
 
-
 // USE THE ROUTES
 
 app.use("/review", reviews);
+app.use("/", users);
 app.use("/", listings);
-
-
-
-
-
-
-
-
-
 
 passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.serializeUser(User.deserializeUser());
 
-
-
-
-
-
-
-
 // HERE IS THE ERROR HANDLING MIDDLEWARE THAT WILL HANDLE ALL ERRORS
 
 app.use((error, request, response) => {
-	console.log("INSIDE THE MIDDLE WARE")
-	console.log(error);
+	console.log(`ERROR HANDLING MIDDLEWARE - ${error}`);
 	let {status = 500, message = "INTERNAL SERVER ERROR"} = error;
 	response.render("error_page.ejs", {statusCode: status, errorText: message});
 	// return error to ejs and use err.stack to show full stack trace on ui

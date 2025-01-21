@@ -13,14 +13,6 @@ router.post("/:id", wrapAsync(async (request, response, next) => {
 	if(result.error) {
 		throw new ExpressError(400, result.error);
 	}
-
-	/*if(review.createdAt === null || review.createdAt === undefined || review.createdAt === '') {
-		review.createdAt = Date.now();
-	}*/
-
-	// USE THIS APPROACH IF YOU HAVE EMBEDDED REVIEW DOCUMENT INSIDE THE LISTING DOCUMENT IN CASE OF ONE TO MANY (ONE TO FEW)
-	// await Listing.findByIdAndUpdate(id, { $push : {reviews: review} }, {new: true, runValidators: true});
-	// USE THIS APPROACH IF YOU HAVE EMBEDDED REVIEW DOCUMENT INSIDE THE LISTING DOCUMENT IN CASE OF ONE TO MANY (APPROACH 02)
 	const userReview = new Review(review);
 	await userReview.save();
 	await Listing.findByIdAndUpdate(id, { $push : {reviews: userReview} }, {new: true, runValidators: true});
