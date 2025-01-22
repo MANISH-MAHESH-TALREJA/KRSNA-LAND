@@ -112,6 +112,109 @@ function getRegisterEmailString(username) {
 		"</html>\n";
 }
 
+
+function getForgotPasswordString(username, salt) {
+  return "<!DOCTYPE html>\n" +
+	  "<html lang='en'>\n" +
+	  "<head>\n" +
+	  "    <meta charset=\"UTF-8\">\n" +
+	  "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
+	  "    <title>Password Reset</title>\n" +
+	  "    <style>\n" +
+	  "        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');\n" +
+	  "\n" +
+	  "        body {\n" +
+	  "            font-family: 'Poppins', Arial, sans-serif;\n" +
+	  "            background-color: #f8f9fa;\n" +
+	  "            margin: 0;\n" +
+	  "            padding: 0;\n" +
+	  "        }\n" +
+	  "\n" +
+	  "        .email-container {\n" +
+	  "            max-width: 600px;\n" +
+	  "            margin: 0 auto;\n" +
+	  "            background-color: #ffffff;\n" +
+	  "            border: 1px solid #dee2e6;\n" +
+	  "            border-radius: 8px;\n" +
+	  "            overflow: hidden;\n" +
+	  "        }\n" +
+	  "\n" +
+	  "        .header {\n" +
+	  "            background-color: #dc3545;\n" +
+	  "            color: #ffffff;\n" +
+	  "            text-align: center;\n" +
+	  "            padding: 20px;\n" +
+	  "        }\n" +
+	  "\n" +
+	  "        .header h1 {\n" +
+	  "            margin: 0;\n" +
+	  "            font-size: 24px;\n" +
+	  "            font-weight: 600;\n" +
+	  "        }\n" +
+	  "\n" +
+	  "        .body {\n" +
+	  "            padding: 20px;\n" +
+	  "            color: #212529;\n" +
+	  "            line-height: 1.6;\n" +
+	  "        }\n" +
+	  "\n" +
+	  "        .body h2 {\n" +
+	  "            font-size: 20px;\n" +
+	  "            font-weight: 600;\n" +
+	  "            margin-bottom: 10px;\n" +
+	  "        }\n" +
+	  "\n" +
+	  "        .body p {\n" +
+	  "            margin-bottom: 15px;\n" +
+	  "        }\n" +
+	  "\n" +
+	  "        .btn {\n" +
+	  "            display: inline-block;\n" +
+	  "            text-decoration: none;\n" +
+	  "            background-color: #dc3545;\n" +
+	  "            color: #ffffff;\n" +
+	  "            padding: 10px 20px;\n" +
+	  "            border-radius: 5px;\n" +
+	  "            font-weight: 600;\n" +
+	  "        }\n" +
+	  "\n" +
+	  "        .btn:hover {\n" +
+	  "            background-color: #a71d2a;\n" +
+	  "        }\n" +
+	  "\n" +
+	  "        .footer {\n" +
+	  "            background-color: #f1f1f1;\n" +
+	  "            text-align: center;\n" +
+	  "            padding: 10px;\n" +
+	  "            font-size: 14px;\n" +
+	  "            color: #6c757d;\n" +
+	  "        }\n" +
+	  "    </style>\n" +
+	  "</head>\n" +
+	  "<body>\n" +
+	  "    <div class=\"email-container\">\n" +
+	  "        <div class=\"header\">\n" +
+	  "            <h1>Reset Your Password</h1>\n" +
+	  "        </div>\n" +
+	  "\n" +
+	  "        <div class=\"body\">\n" +
+	  "            <h2>Hi " + username + ",</h2>\n" +
+	  "            <p>We received a request to reset your password. Click the button below to reset it:</p>\n" +
+	  "            <p style=\"text-align: center;\">\n" +
+	  "                <a href=\"https://localhost:8080/resetPassword/" + salt +"\" class=\"btn\">Reset Password</a>\n" +
+	  "            </p>\n" +
+	  "            <p>If you did not request a password reset, you can safely ignore this email. Your password will remain unchanged.</p>\n" +
+	  "        </div>\n" +
+	  "\n" +
+	  "        <div class=\"footer\">\n" +
+	  "            <p>&copy; 2025 Hare Krishna Land. All rights reserved.</p>\n" +
+	  "        </div>\n" +
+	  "    </div>\n" +
+	  "</body>\n" +
+	  "</html>\n";
+}
+
+
 module.exports = {
-  transporter, getRegisterEmailString
+  transporter, getRegisterEmailString, getForgotPasswordString
 }

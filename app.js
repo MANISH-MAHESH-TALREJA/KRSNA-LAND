@@ -80,9 +80,9 @@ app.use((req, res, next) => {
 });
 
 // USE THE ROUTES
-
-app.use("/review", reviews);
 app.use("/", users);
+app.use("/review", reviews);
+
 app.use("/", listings);
 
 passport.use(new LocalStrategy(User.authenticate()));
