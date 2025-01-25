@@ -10,6 +10,8 @@ const wrapAsync = require("../utils/wrapAsync");
 
 // REQUIRE MODELS
 const {Listing} = require("../models/listing");
+const isLoggedIn = require("../middleware");
+const checkListingOwnership = require("../listingMiddleware")
 
 // REQUIRE LISTING SCHEMA
 const listSchema = require("../schema/listingSchema");
@@ -30,13 +32,13 @@ router.get("/", wrapAsync(async (request, response) => {
 }));
 
 // ADD LISTING PAGE ROUTE
-router.get("/add", (request, response) => {
+router.get("/add", isLoggedIn, (request, response) => {
 	response.render("add_listing");
 });
 
 // ADD LISTING POST ROUTE
 
-router.post("/", wrapAsync(async (request, response) => {
+router.post("/", isLoggedIn, wrapAsync(async (request, response) => {
 	let {title, description, image, price, location, country} = request.body;
 	let result = listSchema.validate(request.body);
 	if (result.error) {
@@ -48,7 +50,8 @@ router.post("/", wrapAsync(async (request, response) => {
 		image: image,
 		price: price,
 		location: location,
-		country: country
+		country: country,
+		createdBy: request.user
 	});
 	await newListing.save();
 	request.flash("toastMessage", "Listing Added Successfully")
@@ -58,7 +61,7 @@ router.post("/", wrapAsync(async (request, response) => {
 
 // EDIT LISTING PAGE ROUTE
 
-router.get("/:id/edit", wrapAsync(async (request, response) => {
+router.get("/:id/edit", isLoggedIn, checkListingOwnership, wrapAsync(async (request, response) => {
 	let {id} = request.params;
 	let fetchedListing = await Listing.findById(id);
 	response.render("edit_listing", {fetchedListing});
@@ -75,7 +78,7 @@ router.get("/:id", wrapAsync(async (request, response) => {
 
 // EDIT LISTING PATCH ROUTE
 
-router.patch("/:id", wrapAsync(async (request, response) => {
+router.patch("/:id", isLoggedIn, checkListingOwnership, wrapAsync(async (request, response) => {
 	let {title, description, image, price, location, country} = request.body;
 	let updateData = {
 		title: title,
@@ -100,7 +103,7 @@ router.patch("/:id", wrapAsync(async (request, response) => {
 
 // DELETE LISTING ROUTE
 
-router.delete("/:id", wrapAsync(async (request, response) => {
+router.delete("/:id", isLoggedIn, checkListingOwnership, wrapAsync(async (request, response) => {
 	let {id} = request.params;
 	Listing.findByIdAndDelete(id).then((result) => {
 		console.log(`${result}`);

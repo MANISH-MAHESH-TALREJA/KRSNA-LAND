@@ -20,6 +20,10 @@ const userSchema = new mongoose.Schema({
 		minLength: 5,
 		unique: true
 	},
+	isAdmin: {
+		type: Boolean,
+		default: false
+	}
 	/*username: {
 		required: true,
 		type: String,

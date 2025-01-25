@@ -16,6 +16,7 @@
                     </li>
                     <li class="list-group-item">&#x1F30D;&nbsp;&nbsp;<b>Country:</b> <%= fetchedListing.country %></li>
                 </ul>
+                <% if(fetchedListing.createdBy) {  if(userAdmin || userId === fetchedListing.createdBy.id) { %>
                 <div style="display: flex; justify-content: center; margin-top: 2rem;">
                     <a style="margin-right: 0.5rem; width: 50%" href="/<%= fetchedListing.id %>/edit"
                        class="btn btn-primary"><i class="fas fa-edit"></i> Edit</a>
@@ -26,6 +27,8 @@
                         </button>
                     </form>
                 </div>
+            <% } } %>
+
                 <% if(fetchedListing.reviews.length > 0) { %>
                     <br>
                 <h5><i>Reviews (<%= fetchedListing.reviews.length %>)</i></h5>
@@ -37,15 +40,20 @@
                                     <h5 class="card-title"><%= review.rating %> Star Review
                                         (<%= review.createdAt.toDateString() %>)</h5>
                                     <p class="card-text"><%= review.comment %></p>
-                                    <div style="display: flex; justify-content: end">
-                                        <button class="btn btn-primary align-right me-2"><i class="fas fa-edit"></i>
-                                            Edit
-                                        </button>
-                                        <form style="display: flex; justify-content: end" method="POST" action="/review/<%= fetchedListing.id %>/<%= review.id %>?_method=DELETE" style="margin-right: 0.5rem; width: 50%">
-                                            <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Trash</button>
-                                        </form>
 
-                                    </div>
+                                    <% if(review.addedBy) {  if(userAdmin || userId === review.addedBy.id) { %>
+                                            <div style="display: flex; justify-content: end">
+                                            <button class="btn btn-primary align-right me-2"><i class="fas fa-edit"></i>
+                                                Edit
+                                            </button>
+                                            <form style="display: flex; justify-content: end" method="POST" action="/review/<%= fetchedListing.id %>/<%= review.id %>?_method=DELETE" style="margin-right: 0.5rem; width: 50%">
+                                                <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Trash</button>
+                                            </form>
+
+                                        </div>
+                                    <% } } %>
+
+
 
                                 </div>
                             </div>

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const {userSchema} = require("./user");
 
 const reviewSchema = new mongoose.Schema({
 	comment: {
@@ -11,6 +12,10 @@ const reviewSchema = new mongoose.Schema({
 		required: true,
 		min: 1,
 		max: 5,
+	},
+	addedBy: {
+		type: userSchema,
+		required: true,
 	},
 	createdAt: {
 		type: Date,

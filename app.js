@@ -21,6 +21,7 @@ const { User } = require("./models/user");
 const app = express();
 let port = 8000;
 app.locals.pageName = "KRSNA LAND";
+app.locals.search = "";
 app.listen(port, () => {
 	console.log(`APP IS LISTENING TO PORT ${port}`);
 });
@@ -68,11 +69,24 @@ app.use((request, response, next) => {
 	response.locals.showToast = request.flash("showToast");
 	// noinspection JSUnresolvedReference
 	response.locals.toastMessage = request.flash("toastMessage");
+	console.log("TOAST MIDDLEWARE");
+	console.log(response.locals.showToast)
+	console.log(response.locals.toastMessage)
 	next();
 });
 
 // HANDLE FAVICON ISSUE - MIDDLEWARE
 app.use((req, res, next) => {
+	if(req.user) {
+		app.locals.userName = req.user.name;
+		app.locals.userId = req.user.id;
+		app.locals.userAdmin = req.user.isAdmin;
+	} else {
+		app.locals.userName = "---";
+		app.locals.userId = "---";
+		app.locals.userAdmin = false;
+	}
+
 	if (req.originalUrl === "/favicon.ico") {
 		return res.status(204).send();
 	}
@@ -86,12 +100,21 @@ app.use("/review", reviews);
 app.use("/", listings);
 
 passport.use(new LocalStrategy(User.authenticate()));
-passport.serializeUser(User.serializeUser());
-passport.serializeUser(User.deserializeUser());
+passport.serializeUser((user, done) => {
+  console.log('Serializing user:', user);
+  done(null, user.id);
+});
+
+passport.deserializeUser((id, done) => {
+  User.findById(id)
+    .then((user) => done(null, user))
+    .catch((error) => done(error, null));
+});
+
 
 // HERE IS THE ERROR HANDLING MIDDLEWARE THAT WILL HANDLE ALL ERRORS
 
-app.use((error, request, response) => {
+app.use((error, request, response, next) => {
 	console.log(`ERROR HANDLING MIDDLEWARE - ${error}`);
 	let {status = 500, message = "INTERNAL SERVER ERROR"} = error;
 	// noinspection JSUnresolvedReference

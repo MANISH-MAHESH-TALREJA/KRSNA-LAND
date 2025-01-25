@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const {Schema} = require("mongoose");
 const {Review} = require("./review.js");
+const {userSchema} = require("./user");
 
 const listingSchema = new mongoose.Schema({
 	title: {
@@ -27,6 +28,10 @@ const listingSchema = new mongoose.Schema({
 	},
 	country: {
 		type: String,
+	},
+	createdBy: {
+		type: userSchema,
+		required: true,
 	},
 	reviews: [
 		{

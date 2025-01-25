@@ -1,12 +1,10 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const router = express.Router();
 const userSchema = require("../schema/userSchema");
 const {User} = require("../models/user");
+const passport = require("passport");
 const wrapAsync = require("../utils/wrapAsync");
-const ExpressError = require("../utils/ExpressError");
-const nodemailer = require("nodemailer");
-const {transporter, getRegisterEmailString, getForgotPasswordString } = require("../utils/emailConfig");
+const {transporter, getRegisterEmailString, getForgotPasswordString} = require("../utils/emailConfig");
 
 async function sendRegisterMail(email) {
 	const info = await transporter.sendMail({
@@ -31,38 +29,51 @@ async function sendForgotPasswordMail(email, salt) {
 }
 
 router.get("/login", (request, response) => {
-	response.render("login");
+	let forward  = request.query.forward || ""
+	console.log(forward);
+	if(request.user) {
+		let goLink = forward || "/";
+		response.redirect(goLink);
+	}
+	response.render("login", {forward});
 });
 
 router.get("/register", (request, response) => {
-	response.render("signup");
+
+	let { forward } = request.query;
+	if(request.user) {
+		let goLink = forward || "/";
+		response.redirect(goLink);
+	}
+	response.render("signup", {forward});
 });
 
 router.post("/resetPassword", wrapAsync(async (request, response) => {
-	let { email } = request.body;
+	let {email} = request.body;
 	console.log(request.body);
 	console.log(email);
-	const resetUser = await User.findOne({ username: email});
+	const resetUser = await User.findOne({username: email});
 	console.log(resetUser);
-	sendForgotPasswordMail(resetUser.username, resetUser.id);
+	await sendForgotPasswordMail(resetUser.username, resetUser.id);
 	request.flash("showToast", "true");
 	request.flash("toastMessage", "Password Reset Mail Sent Successfully");
 	response.redirect("/login");
 }));
 
 router.get("/resetPassword/:id", (request, response) => {
-	let { id } = request.params;
-	response.render("change-password.ejs", { id })
+	let {id} = request.params;
+	response.render("change-password.ejs", {id})
 });
 
 router.post("/resetPassword/:id", wrapAsync(async (request, response) => {
-	let { id } = request.params;
-	const {password, confirmPassword } = request.body;
-	if(password !== confirmPassword) {
+	let {id} = request.params;
+	const {password, confirmPassword} = request.body;
+	if (password !== confirmPassword) {
 		request.flash("showToast", "false");
 		request.flash("toastMessage", "BOTH THE PASSWORDS DO NOT MATCH");
 		response.redirect(`/resetPassword/${id}`);
-	} else {
+	}
+	else {
 		const resetUser = await User.findById(id);
 		await resetUser.setPassword(password);
 		await resetUser.save();
@@ -72,45 +83,68 @@ router.post("/resetPassword/:id", wrapAsync(async (request, response) => {
 	}
 }));
 
-router.post("/login", (request, response) => {
-	const {username, password} = request.body;
-	console.log(username);
-	console.log(password);
-	console.log(request.body);
-	if (username && password) {
-		User.authenticate()(username, password, function (error, result) {
-			if (error) {
-				console.log("Error:", error);
-				console.log("User failed verification");
-				return response.redirect("/login");
+/*router.post(
+  '/login',
+  passport.authenticate('local', {
+    successRedirect: '/',         // Redirect on successful login
+    failureRedirect: '/login',    // Redirect on failed login
+    failureFlash: true,           // Enable flash messages for failure
+  })
+);*/
+
+router.post('/login', (request, response, next) => {
+	console.log(request.query)
+	const originalUrl = request.query.forward || '/';
+	passport.authenticate('local', (error, user, info) => {
+		if(error) {
+			return next(error);
+		}
+		if(!user) {
+			return response.redirect("/login");
+		}
+		request.logIn(user, (error) => {
+			if(error) {
+				return next(error);
 			}
-			else {
-				if (result) {
-					console.log("Authentication result:", result);
-					console.log("User passed verification");
-					return response.redirect("/");
-				}
-				else {
-					request.flash("showToast", "alert");
-					request.flash("toastMessage", "Invalid Login");
-					return response.redirect("/login");
-				}
-			}
-		});
-	}
-	else {
-		request.flash("showToast", "alert");
-		request.flash("toastMessage", "Enter Valid Email & Password");
-		response.redirect("/login");
-	}
+			return response.redirect(originalUrl);
+		})
+	}) (request, response, next);
 });
 
+/*router.post('/login', (req, res, next) => {
+  const redirectUrl = req.query.redirectUrl || '/'; // Get redirect URL from query parameters or default to '/'
+
+  passport.authenticate('local', (err, user, info) => {
+    if (err) {
+      return next(err); // Handle error
+    }
+    if (!user) {
+      return res.redirect('/login'); // Handle failed login
+    }
+    req.logIn(user, (err) => {
+      if (err) {
+        return next(err); // Handle error during login
+      }
+      // Redirect to the provided URL or default to '/'
+      return res.redirect(redirectUrl);
+    });
+  })(req, res, next);
+});*/
+
+
+
 router.post("/register", wrapAsync(async (request, response) => {
+	let forward  = request.query.forward || "" ;
+	let loginLink = "/login", registerLink = "/register";
+	if(forward) {
+		loginLink += `?forward=${forward}`;
+		registerLink += `?forward=${forward}`;
+	}
 	const result = userSchema.validate(request.body)
 	if (result.error) {
 		request.flash("showToast", "alert");
 		request.flash("toastMessage", result.error.message);
-		response.redirect("/register");
+		response.redirect(registerLink);
 	}
 	else {
 		const newUser = new User(request.body.user);
@@ -119,13 +153,24 @@ router.post("/register", wrapAsync(async (request, response) => {
 			sendRegisterMail(result.username).catch(console.error);
 			request.flash("showToast", "alert");
 			request.flash("toastMessage", "Thanks, For Your Registration. Kindly Login To Enjoy Our Services");
-			response.redirect("/login");
+			response.redirect(loginLink);
 		}).catch((error) => {
 			request.flash("showToast", "alert");
 			request.flash("toastMessage", error.message);
-			response.redirect("/register");
+			response.redirect(registerLink);
 		});
 	}
 }));
+
+router.get("/logout", (request, response, next) => {
+	request.logOut((error) => {
+		if(error) {
+			return next(error);
+		}
+		request.flash("toastMessage", "Thanks for using HARE KRISHNA LAND. You are successfully logged out");
+		request.flash("showToast", "false");
+		response.redirect("/login");
+	})
+});
 
 module.exports = router;
