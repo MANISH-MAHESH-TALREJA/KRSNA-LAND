@@ -41,16 +41,9 @@ const listingSchema = new mongoose.Schema({
 	]
 });
 
-listingSchema.pre("findOneAndDelete", async () => {
-	console.log("PRE MIDDLEWARE EXECUTED");
-});
-
 listingSchema.post("findOneAndDelete", async (listing) => {
-	console.log("POST MIDDLEWARE EXECUTED");
-	console.log(listing);
 	if(listing && listing.reviews.length) {
 		await Review.deleteMany({ _id : {$in: listing.reviews }});
-		console.log("ALL REVIEWS DELETED");
 	}
 });
 

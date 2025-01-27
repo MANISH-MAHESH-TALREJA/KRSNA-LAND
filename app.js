@@ -69,26 +69,18 @@ app.use((request, response, next) => {
 	response.locals.showToast = request.flash("showToast");
 	// noinspection JSUnresolvedReference
 	response.locals.toastMessage = request.flash("toastMessage");
-	console.log("TOAST MIDDLEWARE");
-	console.log(response.locals.showToast)
-	console.log(response.locals.toastMessage)
 	next();
 });
 
-// HANDLE FAVICON ISSUE - MIDDLEWARE
-app.use((req, res, next) => {
-	if(req.user) {
-		app.locals.userName = req.user.name;
-		app.locals.userId = req.user.id;
-		app.locals.userAdmin = req.user.isAdmin;
-	} else {
-		app.locals.userName = "---";
-		app.locals.userId = "---";
-		app.locals.userAdmin = false;
-	}
+app.locals.loggedInUser = null;
 
-	if (req.originalUrl === "/favicon.ico") {
-		return res.status(204).send();
+// HANDLE FAVICON ISSUE - MIDDLEWARE
+app.use((request, response, next) => {
+	if(request.user) {
+		app.locals.loggedInUser = request.user;
+	}
+	if (request.originalUrl === "/favicon.ico") {
+		return response.status(204).send();
 	}
 	next();
 });
@@ -96,7 +88,6 @@ app.use((req, res, next) => {
 // USE THE ROUTES
 app.use("/", users);
 app.use("/review", reviews);
-
 app.use("/", listings);
 
 passport.use(new LocalStrategy(User.authenticate()));
@@ -118,7 +109,7 @@ app.use((error, request, response, next) => {
 	console.log(`ERROR HANDLING MIDDLEWARE - ${error}`);
 	let {status = 500, message = "INTERNAL SERVER ERROR"} = error;
 	// noinspection JSUnresolvedReference
-	response.render("error_page.ejs", {statusCode: status, errorText: message});
+	response.render("pages/error-page.ejs", {statusCode: status, errorText: message});
 	// return error to ejs and use err.stack to show full stack trace on ui
 	// res.status(status).send(message);
 });

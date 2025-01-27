@@ -1,0 +1,15 @@
+<%- include('../partials/header.ejs'); %>
+<a href="/add" class="fab">+</a>
+<%- include('../partials/navbar.ejs'); %>
+<%- include('../partials/carousal.ejs'); %>
+<h3 style="margin: 1rem 0 0 1rem;"> Properties</h3>
+
+<div style="display: flex; flex-wrap: wrap">
+    <% for(let listData of listings) { %>
+        <%- include('../partials/list-card.ejs', { listData }); %>
+    <% } %>
+</div>
+
+<%- include('../modals/review.ejs'); %>
+
+<%- include('../partials/footer.ejs'); %>

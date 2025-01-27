@@ -5,27 +5,17 @@
                  class="d-inline-block align-text-top"/>
             HARE KRSNA LAND
         </a>
-        <form class="d-flex align-items-center ms-auto" role="search" action="." method="get">
+        <form class="d-flex align-items-center ms-auto" role="search" action=".." method="get">
             <input class="form-control me-2" type="search" name="search" value="<%= search %>"
                    placeholder="Search Vacation Spots" aria-label="Search"/>
             <button class="btn btn-outline-success" type="submit">Search</button>
         </form>
-        <% if(userName === '---') { %>
-            <div class="d-flex align-items-center ms-auto">
-                <div class="d-flex align-items-center">
+        <% if(loggedInUser && loggedInUser.username) { %>
 
-                    <div class="ms-3 d-none d-md-none d-lg-block">
-                        <a style="text-decoration: none" href="/login" class="text-dark">Login</a>
-                    </div>
-                    <div class="ms-3 d-none d-md-none d-lg-block">
-                        <a style="text-decoration: none" class="btn btn-primary rounded-pill btn-sm" href="/register">Sign
-                            Up</a>
-                    </div>
-                </div>
-            </div>
-        <% } else { %>
 
-            <div class="d-flex align-items-center ms-auto">
+
+
+        <div class="d-flex align-items-center ms-auto">
                 <div class="dropdown me-3 position-relative">
                     <a style="text-decoration: none;" href="#" class="text-reset" id="notificationsDropdown"
                        data-bs-toggle="dropdown" aria-expanded="false">
@@ -59,7 +49,26 @@
                     </ul>
                 </div>
                 <!-- Added welcome message -->
-                <span class="me-3 fw-bold font-italic"> <%= userName %></span>
+                <span class="me-3 fw-bold font-italic"> <%= loggedInUser.username %></span>
+            </div>
+
+
+
+
+
+        <% } else { %>
+
+               <div class="d-flex align-items-center ms-auto">
+                <div class="d-flex align-items-center">
+
+                    <div class="ms-3 d-none d-md-none d-lg-block">
+                        <a style="text-decoration: none" href="/login" class="text-dark">Login</a>
+                    </div>
+                    <div class="ms-3 d-none d-md-none d-lg-block">
+                        <a style="text-decoration: none" class="btn btn-primary rounded-pill btn-sm" href="/register">Sign
+                            Up</a>
+                    </div>
+                </div>
             </div>
 
         <% } %>

@@ -8,5 +8,4 @@ const reviewClientSchema = Joi.object({
 	})
 });
 
-
 module.exports = reviewClientSchema;

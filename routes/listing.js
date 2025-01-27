@@ -1,121 +1,16 @@
-// EXPRESS
-// noinspection DuplicatedCode
-
 const express = require("express");
 const router = express.Router();
+const isLoggedIn = require("../middleware/middleware");
+const checkListingOwnership = require("../middleware/listingMiddleware")
+const listingController = require("../controllers/listingController");
 
-// REQUIRE UTILS
-const ExpressError = require("../utils/ExpressError");
-const wrapAsync = require("../utils/wrapAsync");
-
-// REQUIRE MODELS
-const {Listing} = require("../models/listing");
-const isLoggedIn = require("../middleware");
-const checkListingOwnership = require("../listingMiddleware")
-
-// REQUIRE LISTING SCHEMA
-const listSchema = require("../schema/listingSchema");
-
-// VIEW ALL LISTINGS - HOMEPAGE ROUTE
-
-router.get("/", wrapAsync(async (request, response) => {
-	const {search} = request.query;
-	response.locals.search = search;
-	let listings;
-	if (search && search.length > 3) {
-		listings = await Listing.find({title: {$regex: search, $options: "i"}}).populate("reviews");
-	}
-	else {
-		listings = await Listing.find({}).populate("reviews");
-	}
-	response.render("listing", {listings});
-}));
-
-// ADD LISTING PAGE ROUTE
-router.get("/add", isLoggedIn, (request, response) => {
-	response.render("add_listing");
-});
-
-// ADD LISTING POST ROUTE
-
-router.post("/", isLoggedIn, wrapAsync(async (request, response) => {
-	let {title, description, image, price, location, country} = request.body;
-	let result = listSchema.validate(request.body);
-	if (result.error) {
-		throw new ExpressError(400, result.error);
-	}
-	const newListing = new Listing({
-		title: title,
-		description: description,
-		image: image,
-		price: price,
-		location: location,
-		country: country,
-		createdBy: request.user
-	});
-	await newListing.save();
-	request.flash("toastMessage", "Listing Added Successfully")
-	request.flash("showToast", "true")
-	response.redirect("/");
-}));
-
-// EDIT LISTING PAGE ROUTE
-
-router.get("/:id/edit", isLoggedIn, checkListingOwnership, wrapAsync(async (request, response) => {
-	let {id} = request.params;
-	let fetchedListing = await Listing.findById(id);
-	response.render("edit_listing", {fetchedListing});
-}));
-
-// VIEW LISTING DETAILS ROUTE
-
-router.get("/:id", wrapAsync(async (request, response) => {
-	response.locals.pageName = "LISTING DETAILS";
-	let {id} = request.params;
-	let fetchedListing = await Listing.findById(id).populate("reviews");
-	response.render("show", {fetchedListing});
-}));
-
-// EDIT LISTING PATCH ROUTE
-
-router.patch("/:id", isLoggedIn, checkListingOwnership, wrapAsync(async (request, response) => {
-	let {title, description, image, price, location, country} = request.body;
-	let updateData = {
-		title: title,
-		description: description,
-		image: image,
-		price: price,
-		location: location,
-		country: country
-	}
-	let {id} = request.params;
-	Listing.findByIdAndUpdate(id, {...updateData}, {new: true, runValidators: true}).then((result) => {
-		console.log(`${result}`);
-		request.flash("toastMessage", "Listing Updated Successfully");
-		request.flash("showToast", "true");
-		response.redirect("/");
-	}).catch((error) => {
-		request.flash("toastMessage", error);
-		request.flash("showToast", "false");
-		response.redirect("/");
-	});
-}));
-
-// DELETE LISTING ROUTE
-
-router.delete("/:id", isLoggedIn, checkListingOwnership, wrapAsync(async (request, response) => {
-	let {id} = request.params;
-	Listing.findByIdAndDelete(id).then((result) => {
-		console.log(`${result}`);
-		request.flash("toastMessage", "Listing Deleted Successfully");
-		request.flash("showToast", "true");
-		response.redirect("/");
-	}).catch((error) => {
-		request.flash("toastMessage", error);
-		request.flash("showToast", "false");
-		response.redirect("/");
-	});
-}));
+router.get("/", listingController.indexPage);
+router.get("/add", isLoggedIn, listingController.addListingPage);
+router.get("/:id/edit", isLoggedIn, checkListingOwnership, listingController.editListingPage);
+router.get("/:id", listingController.listingDetailPage);
+router.post("/", isLoggedIn, listingController.addListing);
+router.patch("/:id", isLoggedIn, checkListingOwnership, listingController.updateListing);
+router.delete("/:id", isLoggedIn, checkListingOwnership, listingController.deleteListing);
 
 module.exports = router;
 
