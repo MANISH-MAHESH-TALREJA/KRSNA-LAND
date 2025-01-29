@@ -1,30 +1,9 @@
 const wrapAsync = require("../utils/wrapAsync");
 const {User} = require("../models/user");
 const passport = require("passport");
-const {transporter, getRegisterEmailString, getForgotPasswordString} = require("../utils/emailConfig");
+const {sendRegisterMail, sendForgotPasswordMail} = require("../utils/emailConfig");
 const userSchema = require("../schema/userSchema");
 
-async function sendRegisterMail(email) {
-	const info = await transporter.sendMail({
-		from: '"Hare krishna" <iskcon@yourdigitallift.com>',
-		to: email,
-		subject: "Reset password For Hare Krishna Land ✔",
-		text: "Reset Your Password For Hare Krishna Land",
-		html: getRegisterEmailString(email),
-	});
-	console.log("Message sent: %s", info.messageId);
-}
-
-async function sendForgotPasswordMail(email, salt) {
-	const info = await transporter.sendMail({
-		from: '"Hare krishna" <iskcon@yourdigitallift.com>',
-		to: email,
-		subject: "Welcome To Hare Krishna Land ✔",
-		text: "Thanks for registering with Hare Krishna Land (ISKCON)",
-		html: getForgotPasswordString(email, salt),
-	});
-	console.log("Message sent: %s", info.messageId);
-}
 
 
 module.exports.loginPage = (request, response) => {

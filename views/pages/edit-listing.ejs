@@ -3,7 +3,7 @@
 
 <h1 style="text-align: center; margin: 1rem">Edit Your Listings</h1>
 <form style="margin: 1rem; border-radius: 10px; border: 2px solid black; padding: 1rem;"
-      action="/<%= fetchedListing.id %>?_method=PATCH" method="post">
+      action="/<%= fetchedListing.id %>?_method=PATCH" method="post" enctype="multipart/form-data">
     <div class="mb-3">
         <label for="title" class="form-label">Title</label>
         <input type="text" required class="form-control" id="title" value="<%= fetchedListing.title %>" name="title">
@@ -15,8 +15,7 @@
     </div>
     <div class="mb-3">
         <label for="image" class="form-label">Image</label>
-        <input type="url" class="form-control" id="image" value="<%= fetchedListing.image %>" name="image"
-               aria-describedby="imageHelp">
+        <input type="file" class="form-control" id="image" name="image" aria-describedby="imageHelp">
         <div id="imageHelp" class="form-text">Kindly enter image link url here</div>
     </div>
     <div class="row">

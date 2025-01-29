@@ -2,6 +2,8 @@ const wrapAsync = require("../utils/wrapAsync");
 const {Listing} = require("../models/listing");
 const listSchema = require("../schema/listingSchema");
 const ExpressError = require("../utils/ExpressError");
+const path = require("path");
+const { s3, getS3Params } = require("../utils/amazonS3Config");
 
 module.exports.indexPage = wrapAsync(async (request, response) => {
 	const {search} = request.query;
@@ -21,8 +23,17 @@ module.exports.addListingPage = (request, response) => {
 };
 
 module.exports.addListing = wrapAsync(async (request, response) => {
-	let {title, description, image, price, location, country} = request.body;
-	let result = listSchema.validate(request.body);
+	let image = "";
+	if (request.file)
+	{
+		const fileName = `${Date.now()}_${path.basename(request.file.originalname)}`;
+		const data = await s3.upload(getS3Params(fileName, request.file.buffer, request.file.mimeType)).promise();
+		image = data.Location;
+	}
+	let {title, description, price, location, country} = request.body;
+	let result = listSchema.validate({
+		title, description, image, price, location, country
+	});
 	if (result.error) {
 		throw new ExpressError(400, result.error);
 	}
@@ -55,7 +66,14 @@ module.exports.listingDetailPage = wrapAsync(async (request, response) => {
 });
 
 module.exports.updateListing = wrapAsync(async (request, response) => {
-	let {title, description, image, price, location, country} = request.body;
+	let image = "";
+	if (request.file)
+	{
+		const fileName = `${Date.now()}_${path.basename(request.file.originalname)}`;
+		const data = await s3.upload(getS3Params(fileName, request.file.buffer, request.file.mimeType)).promise();
+		image = data.Location;
+	}
+	let {title, description, price, location, country} = request.body;
 	let updateData = {
 		title: title,
 		description: description,

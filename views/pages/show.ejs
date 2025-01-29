@@ -16,50 +16,59 @@
                     </li>
                     <li class="list-group-item">&#x1F30D;&nbsp;&nbsp;<b>Country:</b> <%= fetchedListing.country %></li>
                 </ul>
-                <% if(fetchedListing.createdBy) {  if(userAdmin || userId === fetchedListing.createdBy.id) { %>
-                <div style="display: flex; justify-content: center; margin-top: 2rem;">
-                    <a style="margin-right: 0.5rem; width: 50%" href="/<%= fetchedListing.id %>/edit"
-                       class="btn btn-primary"><i class="fas fa-edit"></i> Edit</a>
-                    <form method="POST" id="deleteFormMain" style="margin-right: 0.5rem; width: 50%">
-                        <button style="margin-right: 0.5rem; width: 100%" class="btn btn-danger" type="button"
-                                data-id="<%= fetchedListing.id %>"
-                                onclick="deleteListing(this);"><i class="fas fa-trash"></i> Delete
-                        </button>
-                    </form>
-                </div>
-            <% } } %>
+                <% if(fetchedListing.createdBy) {  if(loggedInUser.isAdmin || loggedInUser.id === fetchedListing.createdBy.id) { %>
+                    <div style="display: flex; justify-content: center; margin-top: 2rem;">
+                        <a style="margin-right: 0.5rem; width: 50%" href="/<%= fetchedListing.id %>/edit"
+                           class="btn btn-primary"><i class="fas fa-edit"></i> Edit</a>
+                        <form method="POST" id="deleteFormMain" style="margin-right: 0.5rem; width: 50%">
+                            <button style="margin-right: 0.5rem; width: 100%" class="btn btn-danger" type="button"
+                                    data-id="<%= fetchedListing.id %>"
+                                    onclick="deleteListing(this);"><i class="fas fa-trash"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                <% } } %>
 
                 <% if(fetchedListing.reviews.length > 0) { %>
                     <br>
-                <h5><i>Reviews (<%= fetchedListing.reviews.length %>)</i></h5>
-                <div class="row mt-3">
-                    <% for(let review of fetchedListing.reviews) { %>
-                        <div class="col-sm-6 mb-3">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title"><%= review.rating %> Star Review
-                                        (<%= review.createdAt.toDateString() %>)</h5>
-                                    <p class="card-text"><%= review.comment %></p>
+                    <h5><i>Reviews (<%= fetchedListing.reviews.length %>)</i></h5>
+                    <div class="row mt-3">
+                        <% for(let review of fetchedListing.reviews) { %>
+                            <div class="col-sm-6 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><%= review.rating %> Star Review
+                                            (<%= review.createdAt.toDateString() %>)</h5>
+                                        <p class="card-text"><%= review.comment %></p>
 
-                                    <% if(review.addedBy) {  if(userAdmin || userId === review.addedBy.id) { %>
-                                            <div style="display: flex; justify-content: end">
-                                            <button class="btn btn-primary align-right me-2"><i class="fas fa-edit"></i>
-                                                Edit
-                                            </button>
-                                            <form style="display: flex; justify-content: end" method="POST" action="/review/<%= fetchedListing.id %>/<%= review.id %>?_method=DELETE" style="margin-right: 0.5rem; width: 50%">
-                                                <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Trash</button>
-                                            </form>
+                                        <% if(review.addedBy) {  if(loggedInUser.isAdmin || loggedInUser.id === review.addedBy.id) { %>
+                                            <div style="display: flex; justify-content: start">
+                                                <p class="starability-result me-4" data-rating="<%= review.rating %>" >
+                                                    Rated: 3 stars
+                                                </p>
+                                                <div style="display: flex; justify-content: end">
+                                                    <button class="btn btn-primary align-right me-2"><i
+                                                                class="fas fa-edit"></i>
+                                                        Edit
+                                                    </button>
+                                                    <form style="display: flex; justify-content: end" method="POST"
+                                                          action="/review/<%= fetchedListing.id %>/<%= review.id %>?_method=DELETE"
+                                                          style="width: 50%">
+                                                        <button type="submit" class="btn btn-danger"><i
+                                                                    class="fas fa-trash"></i> Trash
+                                                        </button>
+                                                    </form>
 
-                                        </div>
-                                    <% } } %>
+                                                </div>
+                                            </div>
 
+                                        <% } } %>
 
-
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    <% } %>
-                </div>
+                        <% } %>
+                    </div>
                 <% } %>
 
             </div>

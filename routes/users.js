@@ -2,13 +2,19 @@ const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/userController");
 
-router.get("/login", userController.loginPage);
-router.get("/register", userController.registerPage);
-router.get("/resetPassword/:id", userController.resetPasswordPage);
+router.route("/login")
+	.get(userController.loginPage)
+	.post(userController.login);
+
+router.route("/register")
+	.get(userController.registerPage)
+	.post(userController.register);
+
+router.route("/resetPassword/:id")
+	.get(userController.resetPasswordPage)
+	.post(userController.resetPassword);
+
 router.get("/logout", userController.logoutUser);
 router.post("/sendResetPasswordEmail", userController.sendResetPasswordEmail);
-router.post("/resetPassword/:id", userController.resetPassword);
-router.post('/login', userController.login);
-router.post("/register", userController.register);
 
 module.exports = router;
