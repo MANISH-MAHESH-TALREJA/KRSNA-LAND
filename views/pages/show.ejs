@@ -1,6 +1,7 @@
 <%- include('../partials/header.ejs'); %>
 <%- include('../partials/navbar.ejs'); %>
 <h1 style="text-align: center;margin: 1rem;">Listing Details</h1>
+
 <div class="row">
     <div class="col-8 offset-2">
         <div class="card">
@@ -16,7 +17,7 @@
                     </li>
                     <li class="list-group-item">&#x1F30D;&nbsp;&nbsp;<b>Country:</b> <%= fetchedListing.country %></li>
                 </ul>
-                <% if(fetchedListing.createdBy) {  if(loggedInUser.isAdmin || loggedInUser.id === fetchedListing.createdBy.id) { %>
+                <% if(loggedInUser && fetchedListing.createdBy) {  if(loggedInUser.isAdmin || loggedInUser.id === fetchedListing.createdBy.id) { %>
                     <div style="display: flex; justify-content: center; margin-top: 2rem;">
                         <a style="margin-right: 0.5rem; width: 50%" href="/<%= fetchedListing.id %>/edit"
                            class="btn btn-primary"><i class="fas fa-edit"></i> Edit</a>
@@ -75,6 +76,11 @@
         </div>
     </div>
 </div>
+
+<div id="map" class="col-8 offset-2 mt-3" style="height: 500px; border-radius: 10px;">
+
+</div>
+
 
 
 <%- include('../partials/footer.ejs'); %>

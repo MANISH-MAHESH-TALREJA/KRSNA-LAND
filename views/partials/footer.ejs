@@ -91,6 +91,21 @@
 		})
 	})()
 </script>
+<script>
+    let latitude = "<%= latitude %>";
+	let longitude = "<%= longitude %>";
+    function initMap() {
+	new google.maps.Map(
+		document.getElementById("map"), {
+			zoom: 17.50,
+			center: {
+				lat: parseFloat(latitude) || 19.2856,
+				lng: parseFloat(longitude) || 72.8691
+			},
+		});
+}
+</script>
+<script src= "https://maps.googleapis.com/maps/api/js?key=<%= googleMapsAPIKey %>&libraries=places&callback=initMap"> </script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
         integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
@@ -182,5 +197,24 @@
 		reviewForm.setAttribute("action", `/review/${id}`);
 });
 </script>
+<script>
+        function initAutocomplete()
+        {
+            let autocomplete = new google.maps.places.Autocomplete(document.getElementById("location"));
+            autocomplete.addListener("place_changed", function ()
+            {
+                let place = autocomplete.getPlace();
+                if (!place.geometry) return;
+                let locationData = {
+                    name: place.formatted_address,
+                    latitude: place.geometry.location.lat(),
+                    longitude: place.geometry.location.lng(),
+                };
+                console.log("Selected Location:", locationData);
+				document.querySelector("#coordinates").value = JSON.stringify(locationData);
+            });
+        }
+        window.onload = initAutocomplete;
+    </script>
 </body>
 </html>

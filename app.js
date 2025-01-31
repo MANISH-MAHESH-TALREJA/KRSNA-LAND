@@ -22,6 +22,7 @@ const app = express();
 let port = 8000;
 app.locals.pageName = "KRSNA LAND";
 app.locals.search = "";
+app.locals.googleMapsAPIKey = process.env.GOOGLE_MAPS_API_KEY;
 app.listen(port, () => {
 	console.log(`APP IS LISTENING TO PORT ${port}`);
 });

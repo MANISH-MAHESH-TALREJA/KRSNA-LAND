@@ -38,12 +38,22 @@ const listingSchema = new mongoose.Schema({
 			type: Schema.Types.ObjectId,
 			ref: "review"
 		}
-	]
+	],
+	geometry: {
+		latitude: {
+			type: Number,
+			required: true,
+		},
+		longitude: {
+			type: Number,
+			required: true,
+		}
+	}
 });
 
 listingSchema.post("findOneAndDelete", async (listing) => {
-	if(listing && listing.reviews.length) {
-		await Review.deleteMany({ _id : {$in: listing.reviews }});
+	if (listing && listing.reviews.length) {
+		await Review.deleteMany({_id: {$in: listing.reviews}});
 	}
 });
 
