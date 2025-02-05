@@ -1,14 +1,131 @@
+<%
+let queryString = new URLSearchParams(queryParams);
+queryString.delete("page"); // Remove "page", as it will be dynamically updated
+%>
+
+
 <%- include('../partials/header.ejs'); %>
 <a href="/add" class="fab">+</a>
 <%- include('../partials/navbar.ejs'); %>
 <%- include('../partials/carousal.ejs'); %>
-<h3 style="margin: 1rem 0 0 1rem;"> Properties</h3>
 
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem;">
+    <h3 style="margin: 0;">Properties</h3>
+    <div class="container d-flex gap-2 justify-content-end">
+        <!-- Sort Dropdown -->
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownSort"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fa-solid fa-arrow-down-wide-short"></i>&nbsp;Sort By
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownSort">
+                <li><a class="dropdown-item sortOption" href="/?sort=rating&direction=ASC">Rating
+                        <span>(Highest Rated)</span></a></li>
+                <li><a class="dropdown-item sortOption" href="/?sort=rating&direction=DESC">Rating
+                        <span>(Lowest Rated)</span></a></li>
+                <li><a class="dropdown-item sortOption" href="/?sort=relevance&direction=ASC">Relevance <span>(Newest First)</span></a>
+                </li>
+                <li><a class="dropdown-item sortOption" href="/?sort=relevance&direction=DESC">Relevance <span>(Oldest First)</span></a>
+                </li>
+                <li><a class="dropdown-item sortOption" href="/?sort=price&direction=ASC">Price
+                        <span>(Low - High)</span></a></li>
+                <li><a class="dropdown-item sortOption" href="/?sort=price&direction=DESC">Price
+                        <span>(High - Low)</span></a></li>
+            </ul>
+        </div>
+
+        <!-- Filter Dropdown -->
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownFilter"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fa-solid fa-filter-circle-dollar"></i>&nbsp;Filter
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownFilter">
+                <li><a class="dropdown-item filterOption" href="#">Amazing Views</a></li>
+                <li><a class="dropdown-item filterOption" href="#">Icons</a></li>
+                <li><a class="dropdown-item filterOption" href="#">Amazing Pools</a></li>
+                <li><a class="dropdown-item filterOption" href="#">Farms</a></li>
+                <li><a class="dropdown-item filterOption" href="#">Top Of The World</a></li>
+            </ul>
+        </div>
+
+        <!-- Reset Button -->
+        <button id="clearBtn" class="btn btn-outline-danger"><i class="fa-solid fa-filter-circle-xmark"></i>&nbsp; Reset
+        </button>
+    </div>
+</div>
 <div style="display: flex; flex-wrap: wrap">
     <% for(let listData of listings) { %>
         <%- include('../partials/list-card.ejs', { listData }); %>
     <% } %>
 </div>
+
+<div class="d-flex justify-content-center mt-3">
+    <nav>
+        <ul class="pagination">
+            <li class="page-item <%= page === 1 ? 'disabled' : '' %>">
+                <a class="page-link" href="/?<%= queryString.toString() + '&page=' + (page - 1) %>">Previous</a>
+            </li>
+
+            <% for(let i = 1; i <= totalPages; i++) { %>
+                <li class="page-item <%= i === page ? 'active' : '' %>">
+                    <a class="page-link" href="/?<%= queryString.toString() + '&page=' + i %>"><%= i %></a>
+                </li>
+            <% } %>
+
+            <li class="page-item <%= page === totalPages ? 'disabled' : '' %>">
+                <a class="page-link" href="/?<%= queryString.toString() + '&page=' + (page + 1) %>">Next</a>
+            </li>
+
+
+        </ul>
+    </nav>
+</div>
+
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+    function updateQueryParam(key, value) {
+        let url = new URL(window.location.href);
+        if (value === null) {
+            url.searchParams.delete(key);
+        } else {
+            url.searchParams.set(key, value);
+        }
+        window.location.href = url.toString();
+    }
+
+    document.querySelectorAll(".sortOption").forEach(el => {
+    el.addEventListener("click", function (event) {
+        event.preventDefault();
+
+        let url = new URL(window.location.href);
+        let linkUrl = new URL(this.href, window.location.origin); // Parse the link properly
+
+        // Set sorting and direction while preserving other query params
+        url.searchParams.set("sort", linkUrl.searchParams.get("sort"));
+        url.searchParams.set("direction", linkUrl.searchParams.get("direction"));
+
+        window.location.href = url.toString();
+    });
+});
+
+
+    document.querySelectorAll(".filterOption").forEach(el => {
+        el.addEventListener("click", function (event) {
+            event.preventDefault();
+            updateQueryParam("filter", this.textContent.trim());
+        });
+    });
+
+    document.getElementById("clearBtn").addEventListener("click", function () {
+        let url = new URL(window.location.href);
+        url.search = ""; // Clear all query params
+        window.location.href = url.toString();
+    });
+});
+
+</script>
+
 
 <%- include('../modals/review.ejs'); %>
 

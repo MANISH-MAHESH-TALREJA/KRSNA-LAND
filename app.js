@@ -74,6 +74,8 @@ app.use((request, response, next) => {
 });
 
 app.locals.loggedInUser = null;
+app.locals.latitude = "19.2856";
+app.locals.longitude = "72.8691"
 
 // HANDLE FAVICON ISSUE - MIDDLEWARE
 app.use((request, response, next) => {

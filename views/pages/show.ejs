@@ -1,7 +1,9 @@
 <%- include('../partials/header.ejs'); %>
 <%- include('../partials/navbar.ejs'); %>
 <h1 style="text-align: center;margin: 1rem;">Listing Details</h1>
-
+<script>
+    let listingDetails = <%- JSON.stringify(fetchedListing) %>;
+</script>
 <div class="row">
     <div class="col-8 offset-2">
         <div class="card">
@@ -77,8 +79,9 @@
     </div>
 </div>
 
+<% if(fetchedListing.geometry && fetchedListing.geometry.latitude && fetchedListing.geometry.longitude) { %>
 <div id="map" class="col-8 offset-2 mt-3" style="height: 500px; border-radius: 10px;">
-
+<% } %>
 </div>
 
 
