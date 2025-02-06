@@ -17,7 +17,7 @@ module.exports.indexPage = wrapAsync(async (request, response) => {
 
     // Sorting logic
     const sortDir = direction === "DESC" ? -1 : 1;
-    let sortObject = {};
+    let sortObject = { createdAt: -1 };
 
     if (sort === "rating") {
         sortObject = { reviewsCount: sortDir }; // Custom field for sorting
@@ -92,7 +92,7 @@ module.exports.addListing = wrapAsync(async (request, response) => {
 			longitude: coordinates.longitude,
 		},
 		country: country,
-		createdBy: request.user,
+		createdBy: request.user.id,
 	});
 	await newListing.save();
 	request.flash("toastMessage", "Listing Added Successfully")
@@ -103,40 +103,64 @@ module.exports.addListing = wrapAsync(async (request, response) => {
 module.exports.editListingPage = wrapAsync(async (request, response) => {
 	let {id} = request.params;
 	let fetchedListing = await Listing.findById(id);
-	response.render("pages/edit-listing", {fetchedListing});
+	let geometryJson = {
+		"name": fetchedListing.location,
+		"latitude": fetchedListing.geometry.latitude,
+		"longitude": fetchedListing.geometry.longitude
+	}
+	response.render("pages/edit-listing", {fetchedListing, geometryJson});
 });
 
 module.exports.listingDetailPage = wrapAsync(async (request, response) => {
 	response.locals.pageName = "LISTING DETAILS";
 	let {id} = request.params;
-	let fetchedListing = await Listing.findById(id).populate("reviews");
+	let fetchedListing = await Listing.findById(id).populate("reviews").populate("createdBy");
 	console.log(fetchedListing);
 	if (fetchedListing.geometry) {
 		response.locals.latitude = fetchedListing.geometry.latitude;
 		response.locals.longitude = fetchedListing.geometry.longitude;
-		console.log(response.locals.latitude)
-		console.log(response.locals.longitude)
 	}
 	response.render("pages/show", {fetchedListing});
 });
 
 module.exports.updateListing = wrapAsync(async (request, response) => {
 	let image = "";
+	let {id} = request.params;
 	if (request.file) {
 		const fileName = `${Date.now()}_${path.basename(request.file.originalname)}`;
 		const data = await s3.upload(getS3Params(fileName, request.file.buffer, request.file.mimeType)).promise();
 		image = data.Location;
 	}
-	let {title, description, price, location, country} = request.body;
+	let {title, description, price, country, coordinates} = request.body;
+
+	try {
+		coordinates = JSON.parse(coordinates);
+	}
+	catch (error) {
+		request.flash("toastMessage", "FAILED TO PARSE COORDINATES")
+		request.flash("showToast", "false")
+		return response.redirect(`/${id}/edit`);
+	}
+
+	let result = listSchema.validate({
+		title, description, image, price, country, coordinates
+	});
+	if (result.error) {
+		throw new ExpressError(400, result.error);
+	}
 	let updateData = {
 		title: title,
 		description: description,
 		image: image,
 		price: price,
-		location: location,
-		country: country
+		location: coordinates.name,
+		geometry: {
+			latitude: coordinates.latitude,
+			longitude: coordinates.longitude,
+		},
+		country: country,
 	}
-	let {id} = request.params;
+
 	Listing.findByIdAndUpdate(id, {...updateData}, {new: true, runValidators: true}).then((result) => {
 		console.log(`${result}`);
 		request.flash("toastMessage", "Listing Updated Successfully");

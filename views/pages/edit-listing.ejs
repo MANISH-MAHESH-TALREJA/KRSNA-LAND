@@ -2,37 +2,50 @@
 <%- include('../partials/navbar.ejs'); %>
 
 <h1 style="text-align: center; margin: 1rem">Edit Your Listings</h1>
-<form style="margin: 1rem; border-radius: 10px; border: 2px solid black; padding: 1rem;"
+<form novalidate class="needs-validation" style="margin: 1rem; border-radius: 10px; border: 2px solid black; padding: 1rem;"
       action="/<%= fetchedListing.id %>?_method=PATCH" method="post" enctype="multipart/form-data">
     <div class="mb-3">
         <label for="title" class="form-label">Title</label>
         <input type="text" required class="form-control" id="title" value="<%= fetchedListing.title %>" name="title">
+        <div class="valid-feedback">Looks good!</div>
+        <div class="invalid-feedback">Kindly enter correct value</div>
     </div>
     <div class="mb-3">
         <label for="description" class="form-label">Description</label>
         <textarea id="description" required class="form-control"
                   name="description"><%= fetchedListing.description %></textarea>
+        <div class="valid-feedback">Looks good!</div>
+        <div class="invalid-feedback">Kindly enter correct value</div>
     </div>
     <div class="mb-3">
         <label for="image" class="form-label">Image</label>
         <input type="file" class="form-control" id="image" name="image" aria-describedby="imageHelp">
         <div id="imageHelp" class="form-text">Kindly enter image link url here</div>
+        <div class="valid-feedback">Looks good!</div>
+        <div class="invalid-feedback">Kindly enter correct value</div>
     </div>
     <div class="row">
         <div class="mb-3 col-md-4 col-12">
             <label for="price" class="form-label">Price</label>
             <input type="number" required class="form-control" id="price" name="price"
                    value="<%= fetchedListing.price %>">
+            <div class="valid-feedback">Looks good!</div>
+            <div class="invalid-feedback">Kindly enter correct value</div>
         </div>
         <div class="mb-3 col-md-4 col-12">
-            <label for="location" class="form-label">Location</label>
-            <input type="text" required class="form-control" id="location" name="location"
-                   value="<%= fetchedListing.location %>">
+            <label for="location" class="form-label">Map Location</label>
+            <input type="text" required class="form-control" id="location" name="location" value="<%= fetchedListing.location %>">
+            <input type="hidden" required class="form-control" id="coordinates" name="coordinates" value="<%= JSON.stringify(geometryJson) %>">
+            <div class="valid-feedback">Looks good!</div>
+            <div class="invalid-feedback">Kindly enter correct value</div>
+
         </div>
         <div class="mb-3 col-md-4 col-12">
             <label for="country" class="form-label">Country</label>
             <input type="text" required class="form-control" id="country" name="country"
                    value="<%= fetchedListing.country %>">
+            <div class="valid-feedback">Looks good!</div>
+            <div class="invalid-feedback">Kindly enter correct value</div>
         </div>
     </div>
 

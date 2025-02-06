@@ -65,14 +65,23 @@ module.exports.login = (request, response, next) => {
 	const originalUrl = request.query.forward || '/';
 	passport.authenticate('local', (error, user, info) => {
 		if(error) {
-			return next(error);
+			request.flash("showToast","alert");
+			request.flash("toastMessage",error.toString());
+			return response.redirect("/login");
+			//return next(error);
 		}
 		if(!user) {
+			request.flash("showToast","alert");
+			request.flash("toastMessage","USER NOT FOUND. INVALID CREDENTIALS");
 			return response.redirect("/login");
 		}
 		request.logIn(user, (error) => {
 			if(error) {
-				return next(error);
+				request.flash("showToast","alert");
+				request.flash("toastMessage",error.toString());
+				return response.redirect("/login");
+
+				// return next(error);
 			}
 			return response.redirect(originalUrl);
 		})

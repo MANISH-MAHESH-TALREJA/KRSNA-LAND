@@ -28,7 +28,7 @@ app.listen(port, () => {
 });
 
 async function main() {
-	await mongoose.connect("mongodb://127.0.0.1:27017/krsnaland");
+	await mongoose.connect(process.env.MONGOOSE_CONNECTION_STRING);
 }
 
 main().then((response) => {
@@ -81,6 +81,8 @@ app.locals.longitude = "72.8691"
 app.use((request, response, next) => {
 	if(request.user) {
 		app.locals.loggedInUser = request.user;
+	} else {
+		app.locals.loggedInUser = null;
 	}
 	if (request.originalUrl === "/favicon.ico") {
 		return response.status(204).send();
@@ -110,6 +112,7 @@ passport.deserializeUser((id, done) => {
 
 app.use((error, request, response, next) => {
 	console.log(`ERROR HANDLING MIDDLEWARE - ${error}`);
+	console.log(`ERROR HANDLING MIDDLEWARE - ${request.user}`);
 	let {status = 500, message = "INTERNAL SERVER ERROR"} = error;
 	// noinspection JSUnresolvedReference
 	response.render("pages/error-page.ejs", {statusCode: status, errorText: message});

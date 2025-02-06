@@ -1,12 +1,13 @@
 const nodemailer = require("nodemailer");
+require("dotenv");
 
 const transporter = nodemailer.createTransport({
-  host: "smtpout.secureserver.net",
-  port: 587,
+  host: process.env.EMAIL_HOST,
+  port: process.env.EMAIL_PORT,
   secure: false, // true for port 465, false for other ports
   auth: {
-    user: "contact@yourdigitallift.com",
-    pass: "YDL#ARC#16269",
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
 });
 
@@ -100,7 +101,7 @@ function getRegisterEmailString(username) {
 				<p>We're excited to have you on board! Thank you for joining our community where we strive to make every experience remarkable.</p>
 				<p>Feel free to explore our platform and take advantage of the features we offer. If you have any questions, our support team is here to help you 24/7.</p>
 				<p style="text-align: center;">
-					<a href="https://manishtalreja.com" class="btn">Get Started</a>
+					<a href="https://manishtalreja.com" class="btn" style="color: white">Get Started</a>
 				</p>
 			</div>
 	
@@ -219,10 +220,11 @@ function getForgotPasswordString(username, salt) {
 
 async function sendRegisterMail(email) {
 	const info = await transporter.sendMail({
-		from: '"Hare krishna" <iskcon@yourdigitallift.com>',
+		from: '"Hare Krishna" <iskcon@yourdigitallift.com>',
 		to: email,
-		subject: "Reset password For Hare Krishna Land ✔",
-		text: "Reset Your Password For Hare Krishna Land",
+				subject: "Welcome To Hare Krishna Land ✔",
+		text: "Thanks for registering with Hare Krishna Land (ISKCON)",
+
 		html: getRegisterEmailString(email),
 	});
 	console.log("Message sent: %s", info.messageId);
@@ -230,10 +232,10 @@ async function sendRegisterMail(email) {
 
 async function sendForgotPasswordMail(email, salt) {
 	const info = await transporter.sendMail({
-		from: '"Hare krishna" <iskcon@yourdigitallift.com>',
+		from: '"Hare Krishna" <iskcon@yourdigitallift.com>',
 		to: email,
-		subject: "Welcome To Hare Krishna Land ✔",
-		text: "Thanks for registering with Hare Krishna Land (ISKCON)",
+		subject: "Reset password For Hare Krishna Land ✔",
+		text: "Reset Your Password For Hare Krishna Land",
 		html: getForgotPasswordString(email, salt),
 	});
 	console.log("Message sent: %s", info.messageId);

@@ -14,11 +14,17 @@ module.exports.postReview = wrapAsync(async (request, response, next) => {
 	}
 	const userReview = new Review(review);
 	userReview.addedBy = request.user;
-	await userReview.save();
-	await Listing.findByIdAndUpdate(id, { $push : {reviews: userReview} }, {new: true, runValidators: true});
-	request.flash("toastMessage", "Review Added Successfully")
-	request.flash("showToast", "true")
-	response.redirect("/");
+	userReview.save().then(async (result) => {
+		await Listing.findByIdAndUpdate(id, { $push : {reviews: userReview} }, {new: true, runValidators: true});
+		request.flash("toastMessage", "Review Added Successfully")
+		request.flash("showToast", "true")
+		response.redirect("/");
+	}).catch((error) => {
+		request.flash("toastMessage", error.message)
+		request.flash("showToast", "alert")
+		return response.redirect("/");
+	});
+
 });
 
 module.exports.deleteReview = wrapAsync(async (request, response) => {

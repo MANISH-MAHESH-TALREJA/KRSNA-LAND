@@ -30,7 +30,8 @@ const listingSchema = new mongoose.Schema({
 		type: String,
 	},
 	createdBy: {
-		type: userSchema,
+		type: Schema.Types.ObjectId,
+		ref: "user",
 		required: true,
 	},
 	reviews: [

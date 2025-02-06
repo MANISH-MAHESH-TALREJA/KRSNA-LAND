@@ -1,14 +1,17 @@
-<%- include('../partials/header.ejs'); %>
-<%- include('../partials/navbar.ejs'); %>
-<h1 style="text-align: center;margin: 1rem;">Listing Details</h1>
+<%- include('../partials/header.ejs'); %> <%- include('../partials/navbar.ejs'); %>
+<h1 style="text-align: center; margin: 1rem;">Listing Details</h1>
 <script>
-    let listingDetails = <%- JSON.stringify(fetchedListing) %>;
+	let listingDetails = <%- JSON.stringify(fetchedListing) %>;
 </script>
 <div class="row">
     <div class="col-8 offset-2">
         <div class="card">
-            <img src="<%= fetchedListing.image %>" class="card-img-top show-image" alt="<%= fetchedListing.title %>"
-                 onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1643266421634-467f26f84b56?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';">
+            <img
+                    src="<%= fetchedListing.image %>"
+                    class="card-img-top show-image"
+                    alt="<%= fetchedListing.title %>"
+                    onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1643266421634-467f26f84b56?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';"
+            />
             <div class="card-body">
                 <p class="card-text"><b><%= fetchedListing.title %></b></p>
                 <p class="card-text"><i><%= fetchedListing.description %></i></p>
@@ -19,61 +22,83 @@
                     </li>
                     <li class="list-group-item">&#x1F30D;&nbsp;&nbsp;<b>Country:</b> <%= fetchedListing.country %></li>
                 </ul>
-                <% if(loggedInUser && fetchedListing.createdBy) {  if(loggedInUser.isAdmin || loggedInUser.id === fetchedListing.createdBy.id) { %>
+                <% if(loggedInUser && fetchedListing.createdBy) { if(loggedInUser.isAdmin || loggedInUser.id === fetchedListing.createdBy.id) { %>
                     <div style="display: flex; justify-content: center; margin-top: 2rem;">
-                        <a style="margin-right: 0.5rem; width: 50%" href="/<%= fetchedListing.id %>/edit"
+                        <a style="margin-right: 0.5rem; width: 50%;" href="/<%= fetchedListing.id %>/edit"
                            class="btn btn-primary"><i class="fas fa-edit"></i> Edit</a>
-                        <form method="POST" id="deleteFormMain" style="margin-right: 0.5rem; width: 50%">
-                            <button style="margin-right: 0.5rem; width: 100%" class="btn btn-danger" type="button"
-                                    data-id="<%= fetchedListing.id %>"
-                                    onclick="deleteListing(this);"><i class="fas fa-trash"></i> Delete
+                        <form method="POST" id="deleteFormMain" style="margin-right: 0.5rem; width: 50%;">
+                            <button style="margin-right: 0.5rem; width: 100%;" class="btn btn-danger" type="button"
+                                    data-id="<%= fetchedListing.id %>" onclick="deleteListing(this);"><i
+                                        class="fas fa-trash"></i> Delete
                             </button>
                         </form>
                     </div>
                 <% } } %>
-
                 <% if(fetchedListing.reviews.length > 0) { %>
-                    <br>
+                    <br/>
                     <h5><i>Reviews (<%= fetchedListing.reviews.length %>)</i></h5>
                     <div class="row mt-3">
                         <% for(let review of fetchedListing.reviews) { %>
                             <div class="col-sm-6 mb-3">
                                 <div class="card">
                                     <div class="card-body">
+                                        <div class="row align-items-center">
+                                            <div class="col-auto">
+                                                <img src="https://pngimg.com/d/smiley_PNG144.png" height="40" width="40"
+                                                     class="rounded-circle"/>
+
+                                            </div>
+                                            <div class="col">
+                                        <span class="fw-bold font-italic">
+                                            <% if (review.addedBy) { %>
+                                                <%= review.addedBy.name %>
+                                                <% if (review.addedBy.isAdmin) { %>
+                                                    <span class="badge bg-danger ms-2">Admin</span>
+                                                <% } %>
+                                            <% } else { %>
+                                                Anonymous
+                                            <% } %>
+                                        </span>
+                                                <br/>
+                                                <span class="text-muted">
+                                                    <% if (review.addedBy && review.addedBy.username) { %> <%= review.addedBy.username %>
+                                                    <% } else { %>
+                                                    <% } %>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <br/>
                                         <h5 class="card-title"><%= review.rating %> Star Review
                                             (<%= review.createdAt.toDateString() %>)</h5>
                                         <p class="card-text"><%= review.comment %></p>
 
-                                        <% if(review.addedBy) {  if(loggedInUser.isAdmin || loggedInUser.id === review.addedBy.id) { %>
-                                            <div style="display: flex; justify-content: start">
-                                                <p class="starability-result me-4" data-rating="<%= review.rating %>" >
-                                                    Rated: 3 stars
+                                        <% if(review.addedBy && loggedInUser) { if(loggedInUser.isAdmin || loggedInUser.id === review.addedBy.id) { %>
+                                            <div style="display: flex; justify-content: space-between;">
+                                                <p class="starability-result me-4" data-rating="<%= review.rating %>">
+
                                                 </p>
-                                                <div style="display: flex; justify-content: end">
-                                                    <button class="btn btn-primary align-right me-2"><i
-                                                                class="fas fa-edit"></i>
+                                                <div style="display: flex; justify-content: end;">
+                                                    <button class="btn btn-primary align-right me-2">
+                                                        <i class="fas fa-edit"></i>
                                                         Edit
                                                     </button>
-                                                    <form style="display: flex; justify-content: end" method="POST"
+                                                    <form style="display: flex; justify-content: end;" method="POST"
                                                           action="/review/<%= fetchedListing.id %>/<%= review.id %>?_method=DELETE"
-                                                          style="width: 50%">
+                                                          style="width: 50%;">
                                                         <button type="submit" class="btn btn-danger"><i
                                                                     class="fas fa-trash"></i> Trash
                                                         </button>
                                                     </form>
-
                                                 </div>
                                             </div>
 
                                         <% } } %>
-
                                     </div>
                                 </div>
                             </div>
                         <% } %>
                     </div>
                 <% } %>
-
             </div>
         </div>
     </div>
@@ -81,9 +106,7 @@
 
 <% if(fetchedListing.geometry && fetchedListing.geometry.latitude && fetchedListing.geometry.longitude) { %>
 <div id="map" class="col-8 offset-2 mt-3" style="height: 500px; border-radius: 10px;">
-<% } %>
+    <% } %>
 </div>
-
-
 
 <%- include('../partials/footer.ejs'); %>
